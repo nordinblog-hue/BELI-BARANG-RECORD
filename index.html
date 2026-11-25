@@ -6,8 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Beli Barang">
-    <meta name="theme-color" content="#4f46e5">
-    <title>Beli Barang Record — Senarai Belian & Peringatan Pintar</title>
+    <meta name="theme-color" content="#059669">
+    <title>Beli Barang Record — Senarai Beli Barang Ringkas</title>
 
     <!-- Dynamic PWA Manifest & Apple Touch Icon (Populated via JS Canvas) -->
     <link id="pwa-manifest" rel="manifest" href="">
@@ -28,27 +28,6 @@
                 extend: {
                     fontFamily: {
                         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
-                        },
-                        emerald: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                        }
                     }
                 }
             }
@@ -63,21 +42,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.3);
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.6);
-        }
-        .glass-card {
+        .glass-header {
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
@@ -88,67 +53,54 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .animate-slide-up {
-            animation: slideUp 0.25s ease-out forwards;
-        }
-        @keyframes softPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.65; }
-        }
-        .animate-soft-pulse {
-            animation: softPulse 2s infinite ease-in-out;
+        .animate-pop-in {
+            animation: popIn 0.2s ease-out forwards;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-28 md:pb-14">
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-32">
 
     <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-30 bg-white/85 dark:bg-slate-900/85 glass-card border-b border-slate-200/80 dark:border-slate-800">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
-            <!-- Brand Logo -->
-            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+    <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 glass-header border-b border-slate-200/80 dark:border-slate-800">
+        <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between gap-2">
+            <!-- Brand Logo & Sync Status -->
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 shrink-0">
                     <i data-lucide="shopping-bag" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
-                    <h1 class="text-sm sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-emerald-600 dark:from-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent truncate">
+                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white truncate">
                         Beli Barang Record
                     </h1>
-                    <div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                    <div class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                         <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0"></span>
-                        <span id="sync-status-text" class="truncate">Mod Tetamu (Simpanan Lokal)</span>
+                        <span id="sync-status-text" class="truncate">Mod Tetamu (Lokal)</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Controls -->
+            <!-- Right Action Controls -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <!-- Sync Local Data Button -->
-                <button id="btn-sync-local" onclick="window.syncGuestDataToCloud()" class="hidden items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 transition">
+                <button id="btn-sync-local" onclick="window.syncGuestDataToCloud()" class="hidden items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 transition">
                     <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i>
-                    <span class="hidden sm:inline">Sync Data Tetamu ke Cloud</span>
-                    <span id="local-count-badge" class="bg-amber-600 text-white px-1.5 py-0.2 rounded-full text-[10px]">0</span>
-                </button>
-
-                <!-- Enable Notification Button -->
-                <button id="btn-notif-perm" onclick="window.requestNotificationPermission()" title="Aktifkan Notifikasi Reminder" class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition">
-                    <i id="icon-notif" data-lucide="bell-ring" class="w-4 h-4"></i>
-                    <span id="text-notif-status" class="hidden md:inline">Aktifkan Reminder</span>
+                    <span class="hidden sm:inline">Sync</span>
+                    <span id="local-count-badge" class="bg-amber-600 text-white px-1.5 rounded-full text-[10px]">0</span>
                 </button>
 
                 <!-- Theme Toggle -->
-                <button id="btn-theme-toggle" onclick="window.toggleTheme()" title="Tukar Tema Gelap/Terang" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                <button onclick="window.toggleTheme()" title="Tukar Mod Gelap / Cerah" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
                     <i id="icon-theme" data-lucide="moon" class="w-4 h-4"></i>
                 </button>
 
-                <!-- Auth Section -->
+                <!-- Google Login Button (Guest View) -->
                 <div id="auth-guest-view">
-                    <button onclick="window.loginWithGoogle()" class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-sm shadow-indigo-500/30 transition">
-                        <svg class="w-4 h-4 bg-white rounded-full p-0.5 shrink-0" viewBox="0 0 24 24">
+                    <button onclick="window.loginWithGoogle()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-bold shadow-sm transition active:scale-95">
+                        <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
                             <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"/>
                             <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"/>
@@ -158,13 +110,10 @@
                     </button>
                 </div>
 
+                <!-- Logged-in User View -->
                 <div id="auth-user-view" class="hidden items-center gap-2">
-                    <div class="hidden md:flex flex-col text-right">
-                        <span id="user-name" class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight">Pengguna</span>
-                        <span id="user-email" class="text-[10px] text-slate-500 dark:text-slate-400">user@gmail.com</span>
-                    </div>
                     <img id="user-avatar" src="" alt="Profil" class="w-8 h-8 rounded-full border-2 border-emerald-500 object-cover">
-                    <button onclick="window.logoutUser()" title="Log Keluar" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition">
+                    <button onclick="window.logoutUser()" title="Log Keluar" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -172,314 +121,244 @@
         </div>
     </header>
 
-    <!-- Active Reminder Alert Banner (Appears when a reminder triggers) -->
-    <div id="reminder-alert-banner" class="hidden max-w-5xl mx-auto px-4 sm:px-6 pt-4">
-        <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/20 flex items-center justify-between gap-3 animate-slide-up">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 animate-bounce">
-                    <i data-lucide="bell-ring" class="w-5 h-5"></i>
-                </div>
-                <div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-amber-100">Peringatan Beli Barang!</div>
-                    <div id="reminder-alert-text" class="text-sm sm:text-base font-extrabold leading-snug"></div>
-                </div>
-            </div>
-            <button onclick="window.dismissReminderBanner()" class="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-xs font-bold shrink-0 transition">
-                Tutup
-            </button>
-        </div>
-    </div>
-
     <!-- Main Container -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-5 space-y-5">
+    <main class="max-w-3xl mx-auto px-4 pt-5 space-y-5">
 
-        <!-- Prominent Action Bar: Share WhatsApp Today & Add Item -->
-        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    <i data-lucide="calendar-check" class="w-4 h-4"></i>
-                    <span id="header-today-date">Hari Ini</span>
-                </div>
-                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">
-                    Senarai Barang Perlu Beli
-                </h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Tetapkan tarikh beli & masa reminder supaya tak lupa bila keluar ke kedai.
-                </p>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-2.5">
-                <!-- Primary WhatsApp Share Button (Today's List) -->
-                <button onclick="window.shareWhatsAppList('today')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs sm:text-sm font-extrabold bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-md shadow-emerald-600/20 transition">
-                    <i data-lucide="share-2" class="w-4 h-4"></i>
-                    <span>Share List Barang Hari Ini ke WhatsApp</span>
-                </button>
-
-                <!-- Secondary Share Dropdown / All Pending Button -->
-                <div class="flex items-center gap-1.5">
-                    <button onclick="window.shareWhatsAppList('all_pending')" title="Kongsi Semua Barang Belum Beli ke WhatsApp" class="px-3 py-3 rounded-2xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 transition">
-                        Semua Belum Beli
-                    </button>
-                    <button onclick="window.copyWhatsAppText('today')" title="Salin Teks Senarai Hari Ini" class="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
-                        <i data-lucide="copy" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-                <!-- Desktop Add Item Button -->
-                <button onclick="window.openItemModal()" class="hidden md:flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-extrabold bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white shadow-md shadow-indigo-600/20 transition">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
-                    <span>Tambah Barang</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Quick Status Summary Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div onclick="window.setActiveTab('today')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-indigo-400 transition shadow-sm">
+        <!-- 1. BORANG TAMBAH BARANG PANTAS -->
+        <section class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm">
+            <form id="quick-add-form" onsubmit="window.handleQuickAdd(event)" class="space-y-3">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Hari Ini</span>
-                    <span class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400">
-                        <i data-lucide="sun" class="w-4 h-4"></i>
-                    </span>
+                    <label for="input-item-name" class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Tambah Barang Nak Beli</span>
+                    </label>
+                    <span class="text-[11px] text-slate-400">Tekan Enter untuk terus tambah</span>
                 </div>
-                <div id="count-today" class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">Target / Remind hari ini</div>
-            </div>
 
-            <div onclick="window.setActiveTab('overdue')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-rose-400 transition shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Lewat (Overdue)</span>
-                    <span class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400">
-                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                    </span>
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                    <!-- Nama Barang -->
+                    <div class="sm:col-span-6">
+                        <input type="text" id="input-item-name" required autocomplete="off" placeholder="Nama barang (cth: Roti, Ubat Gigi, Kopi)..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <!-- Kuantiti -->
+                    <div class="sm:col-span-3">
+                        <input type="text" id="input-item-qty" autocomplete="off" placeholder="Kuantiti (cth: 1 pek)" value="1" class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+
+                    <!-- Butang Tambah Besar -->
+                    <div class="sm:col-span-3">
+                        <button type="submit" class="w-full h-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-sm sm:text-base shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                            <span>Tambah</span>
+                        </button>
+                    </div>
                 </div>
-                <div id="count-overdue" class="text-2xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">0</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">Belum dibeli & terlepas</div>
-            </div>
 
-            <div onclick="window.setActiveTab('upcoming')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-amber-400 transition shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Akan Datang</span>
-                    <span class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400">
-                        <i data-lucide="calendar-clock" class="w-4 h-4"></i>
-                    </span>
+                <!-- Preset Kuantiti Pantas -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+                    <span class="text-[11px] font-semibold text-slate-400 shrink-0 mr-1">Kuantiti pantas:</span>
+                    <button type="button" onclick="window.setQuickQty('1')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1</button>
+                    <button type="button" onclick="window.setQuickQty('2')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">2</button>
+                    <button type="button" onclick="window.setQuickQty('1 pek')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 pek</button>
+                    <button type="button" onclick="window.setQuickQty('1 botol')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 botol</button>
+                    <button type="button" onclick="window.setQuickQty('1 kg')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 kg</button>
+                    <button type="button" onclick="window.setQuickQty('1 kotak')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 kotak</button>
                 </div>
-                <div id="count-upcoming" class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">0</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">Dijadualkan esok & lusa</div>
-            </div>
+            </form>
+        </section>
 
-            <div onclick="window.setActiveTab('bought')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-emerald-400 transition shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Sudah Beli</span>
-                    <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400">
-                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
-                    </span>
+        <!-- 2. PERKONGSIAN PANTAS WHATSAPP & TELEGRAM (NEUTRAL & SANTAI) -->
+        <section class="bg-gradient-to-br from-emerald-50 to-teal-50/70 dark:from-slate-900 dark:to-slate-900 p-4 sm:p-5 rounded-3xl border border-emerald-200/80 dark:border-slate-800 shadow-sm space-y-3.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i data-lucide="send" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                        <span>Kongsi / Kirim Senarai Barang</span>
+                    </h2>
+                    <p id="share-helper-text" class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                        Hantar <strong class="text-emerald-700 dark:text-emerald-400">semua barang belum beli</strong> ke WhatsApp / Telegram, atau pilih item tertentu sahaja.
+                    </p>
                 </div>
-                <div id="count-bought" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">Selesai dibeli</div>
-            </div>
-        </div>
 
-        <!-- Smart Filter Tabs & Search / Category Bar -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3.5">
-            <!-- Tabs -->
-            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1" id="smart-tabs">
-                <button data-tab="all" onclick="window.setActiveTab('all')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow-sm">
-                    Semua (<span id="tab-badge-all">0</span>)
-                </button>
-                <button data-tab="today" onclick="window.setActiveTab('today')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
-                    Hari Ini (<span id="tab-badge-today">0</span>)
-                </button>
-                <button data-tab="overdue" onclick="window.setActiveTab('overdue')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
-                    Lewat (Overdue) (<span id="tab-badge-overdue">0</span>)
-                </button>
-                <button data-tab="upcoming" onclick="window.setActiveTab('upcoming')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
-                    Akan Datang (<span id="tab-badge-upcoming">0</span>)
-                </button>
-                <button data-tab="bought" onclick="window.setActiveTab('bought')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
-                    Sudah Beli (<span id="tab-badge-bought">0</span>)
-                </button>
-            </div>
-
-            <!-- Search & Category Filter -->
-            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                <div class="sm:col-span-7 relative">
-                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                    <input type="text" id="search-input" oninput="window.renderItems()" placeholder="Cari nama barang, kedai atau catatan..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div class="sm:col-span-5">
-                    <select id="filter-category" onchange="window.renderItems()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="Semua">Semua Kategori / Kedai</option>
-                        <option value="Barang Dapur">Barang Dapur</option>
-                        <option value="Keperluan Rumah">Keperluan Rumah</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="Kedai RM2">Kedai RM2</option>
-                        <option value="DIY">DIY</option>
-                        <option value="Lain-lain">Lain-lain</option>
+                <!-- Pilihan Gaya Mesej Neutral & Santai -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">Gaya Mesej:</span>
+                    <select id="share-style" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="tolong">Tolong belikan jap 🙏</option>
+                        <option value="senarai">Senarai barang nak beli 🛒</option>
+                        <option value="ringkas">Terus senarai (Ringkas)</option>
                     </select>
                 </div>
             </div>
-        </div>
 
-        <!-- Records List Section -->
-        <div class="space-y-3">
-            <div class="flex items-center justify-between px-1">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Paparan Senarai (<span id="list-showing-count">0</span>)
-                </h3>
-                <span class="text-[11px] text-slate-400">Klik kotak semak untuk tandakan Sudah Beli</span>
+            <!-- Bar Kawalan Pilih Barang Tertentu (Multi-Select Mode) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-emerald-200/60 dark:border-slate-800">
+                <button type="button" id="btn-toggle-select-mode" onclick="window.toggleSelectMode()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 transition shadow-sm">
+                    <i data-lucide="list-checks" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+                    <span id="text-toggle-select-mode">Pilih Barang Tertentu</span>
+                </button>
+
+                <div id="select-mode-actions" class="hidden items-center gap-2">
+                    <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                        Dipilih: <span id="selected-count">0</span>
+                    </span>
+                    <button type="button" onclick="window.selectAllPending()" class="text-[11px] font-bold underline text-slate-600 dark:text-slate-300 hover:text-indigo-600">Pilih Semua Belum Beli</button>
+                    <button type="button" onclick="window.clearSelection()" class="text-[11px] font-bold underline text-rose-600 dark:text-rose-400">Kosongkan</button>
+                </div>
             </div>
 
-            <!-- Cards Grid -->
-            <div id="items-list" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                <!-- Rendered by JS -->
+            <!-- Butang Utama WhatsApp, Telegram & Salin -->
+            <div class="grid grid-cols-12 gap-2.5">
+                <!-- WhatsApp -->
+                <button type="button" onclick="window.shareList('whatsapp')" class="col-span-5 py-3 px-3 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/>
+                    </svg>
+                    <span>WhatsApp</span>
+                </button>
+
+                <!-- Telegram -->
+                <button type="button" onclick="window.shareList('telegram')" class="col-span-5 py-3 px-3 rounded-2xl bg-[#229ED9] hover:bg-[#1d8cc2] active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 transition">
+                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                    <span>Telegram</span>
+                </button>
+
+                <!-- Copy Text -->
+                <button type="button" onclick="window.copyShareText()" title="Salin Teks Senarai" class="col-span-2 py-3 px-2 rounded-2xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center transition">
+                    <i data-lucide="copy" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. PENAPIS TAB & TINDAKAN BERSIHKAN DAH BELI -->
+        <section class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <!-- Tab Penapis: Semua, Belum Beli, Tiada Stok, Dah Beli -->
+                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+                    <button type="button" id="tab-all" onclick="window.setFilterTab('all')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm">
+                        <span>Semua</span>
+                        <span id="count-all" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20 dark:bg-slate-900/20">0</span>
+                    </button>
+
+                    <button type="button" id="tab-pending" onclick="window.setFilterTab('pending')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
+                        <span>Belum Beli</span>
+                        <span id="count-pending" class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">0</span>
+                    </button>
+
+                    <button type="button" id="tab-outofstock" onclick="window.setFilterTab('outofstock')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
+                        <span>Tiada Stok</span>
+                        <span id="count-outofstock" class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">0</span>
+                    </button>
+
+                    <button type="button" id="tab-bought" onclick="window.setFilterTab('bought')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
+                        <span>Dah Beli</span>
+                        <span id="count-bought" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300">0</span>
+                    </button>
+                </div>
+
+                <!-- Butang Padam Semua Dah Beli -->
+                <button type="button" id="btn-clear-bought" onclick="window.openClearBoughtModal()" class="hidden items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition shrink-0">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <span>Padam Semua Dah Beli</span>
+                </button>
+            </div>
+
+            <!-- Senarai Kad Barang -->
+            <div id="items-list-container" class="space-y-2.5">
+                <!-- Rendered via JS -->
             </div>
 
             <!-- Empty State -->
-            <div id="empty-state" class="hidden bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 p-10 text-center">
-                <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 flex items-center justify-center mx-auto mb-3">
-                    <i data-lucide="clipboard-list" class="w-7 h-7"></i>
+            <div id="empty-list-state" class="hidden bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-500 flex items-center justify-center mx-auto mb-2.5">
+                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
                 </div>
-                <h3 class="text-base font-extrabold text-slate-800 dark:text-white">Tiada Barang Dalam Senarai Ini</h3>
-                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 mb-4">
-                    Tambah barang yang perlu dibeli berserta tarikh dan masa reminder supaya anda tidak terlupa.
+                <h4 id="empty-state-title" class="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">Senarai Masih Kosong</h4>
+                <p id="empty-state-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Taip nama barang di kotak atas untuk mula mencatat barang nak beli.
                 </p>
-                <button onclick="window.openItemModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition">
-                    <i data-lucide="plus" class="w-4 h-4"></i>
-                    <span>Tambah Barang Sekarang</span>
-                </button>
             </div>
-        </div>
+        </section>
     </main>
 
-    <!-- Mobile Floating Action Button (FAB) -->
-    <button onclick="window.openItemModal()" aria-label="Tambah Barang" class="md:hidden fixed bottom-6 right-6 z-30 w-14 h-14 rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center active:scale-90 transition">
-        <i data-lucide="plus" class="w-7 h-7"></i>
-    </button>
-
-    <!-- MODAL 1: Add / Edit Item (No Price / No Budget) -->
-    <div id="item-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-slide-up my-auto">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
-                <h3 id="item-modal-title" class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                    <i data-lucide="package-plus" class="w-5 h-5 text-indigo-600"></i>
-                    <span>Tambah Barang Perlu Beli</span>
+    <!-- MODAL 1: Edit Barang & Status Kedai Tiada Stok -->
+    <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-pop-in">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="edit-3" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Edit Barang / Status Stok</span>
                 </h3>
-                <button onclick="window.closeItemModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <button onclick="window.closeEditModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <form id="item-form" onsubmit="window.handleSaveItem(event)" class="p-5 sm:p-6 space-y-4">
-                <input type="hidden" id="item-id">
+            <form onsubmit="window.handleSaveEdit(event)" class="p-5 space-y-4">
+                <input type="hidden" id="edit-item-id">
 
-                <!-- Nama Barang -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Barang *</label>
-                    <input type="text" id="item-name" required placeholder="Contoh: Beras 10kg, Mentol LED, Sabun Basuh..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="edit-item-name" required class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
 
-                <!-- Kuantiti & Unit + Kategori / Kedai -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kuantiti & Unit</label>
-                        <input type="text" id="item-qty-unit" placeholder="Contoh: 2 pek, 1 botol, 3 kg" value="1" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori / Kedai</label>
-                        <select id="item-category" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="Barang Dapur">Barang Dapur</option>
-                            <option value="Keperluan Rumah">Keperluan Rumah</option>
-                            <option value="Hardware">Hardware</option>
-                            <option value="Kedai RM2">Kedai RM2</option>
-                            <option value="DIY">DIY</option>
-                    <!-- Tarikh & Masa Reminder (Pilihan / Optional Toggle) -->
-                    <div class="pt-2 border-t border-indigo-100 dark:border-indigo-900/50">
-                        <div class="flex items-center justify-between">
-                            <label for="item-enable-reminder" class="flex items-center gap-2 cursor-pointer select-none">
-                                <span class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                                    <i data-lucide="bell" class="w-3.5 h-3.5"></i>
-                                </span>
-                                <div>
-                                    <span class="block text-xs font-extrabold text-slate-800 dark:text-slate-200">Set Reminder (Pilihan)</span>
-                                    <span class="block text-[10px] text-slate-500 dark:text-slate-400">Aktifkan hanya jika mahu amaran masa</span>
-                                </div>
-                            </label>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="item-enable-reminder" onchange="window.toggleReminderFields()" class="sr-only peer">
-                                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
-                            </label>
-                        </div>
-
-                        <div id="reminder-fields-container" class="hidden mt-3 pt-2.5 border-t border-dashed border-amber-200/80 dark:border-amber-900/40 space-y-2.5 animate-slide-up">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400">Remind Sebelum Bila & Kul Berapa</span>
-                                <div class="flex gap-1">
-                                    <button type="button" onclick="window.setQuickRemindPreset('same_day')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">Hari Sama</button>
-                                    <button type="button" onclick="window.setQuickRemindPreset('day_before')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">1 Hari Sebelum</button>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2.5">
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Tarikh Reminder</label>
-                                    <input type="date" id="item-tarikh-remind" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Masa Reminder (Kul Berapa)</label>
-                                    <input type="time" id="item-masa-remind" value="17:00" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Catatan / Jenama Spesifik -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Catatan / Jenama Spesifik (Optional)</label>
-                    <textarea id="item-notes" rows="2" placeholder="Contoh: Jenama Cap Rambutan, saiz besar, kedai depan simpang..." class="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kuantiti</label>
+                    <input type="text" id="edit-item-qty" placeholder="Contoh: 1 pek, 2 botol, 1 kg" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
 
-                <!-- Status Toggle inside Modal -->
-                <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700">
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Status Pembelian</span>
-                    <select id="item-status" class="bg-transparent text-xs font-extrabold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer">
-                        <option value="belum">Belum Beli</option>
-                        <option value="sudah">Sudah Beli</option>
-                    </select>
+                <!-- Status Tiada Stok di Kedai -->
+                <div class="flex items-center justify-between p-3.5 rounded-2xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50">
+                    <div>
+                        <span class="block text-xs font-extrabold text-rose-700 dark:text-rose-400">Kedai Tiada Stok?</span>
+                        <span class="block text-[11px] text-slate-500 dark:text-slate-400">Tandakan jika barang ini habis di kedai</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="edit-item-outofstock" class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-rose-600"></div>
+                    </label>
                 </div>
 
-                <!-- Form Buttons -->
-                <div class="flex items-center justify-end gap-2.5 pt-2">
-                    <button type="button" onclick="window.closeItemModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition">
+                <!-- Nota Ringkas (Pilihan) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nota Ringkas (Pilihan)</label>
+                    <input type="text" id="edit-item-note" placeholder="Cth: Kedai depan habis stok, cuba cari di kedai lain..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" onclick="window.closeEditModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 transition">
                         Batal
                     </button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 shadow-md shadow-indigo-500/20 transition">
-                        Simpan Barang
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition">
+                        Simpan Perubahan
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 2: Delete Confirmation -->
-    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 text-center animate-slide-up">
+    <!-- MODAL 2: Pengesahan Padam Semua Dah Beli -->
+    <div id="clear-bought-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 text-center animate-pop-in">
             <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center mx-auto mb-3">
                 <i data-lucide="trash-2" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Padam Barang Ini?</h3>
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Padam Semua Barang Dah Beli?</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5">
-                Rekod <span id="delete-item-name" class="font-bold text-slate-700 dark:text-slate-200"></span> akan dipadam secara kekal.
+                Semua item bertanda <strong>Dah Beli</strong> akan dipadam daripada senarai anda.
             </p>
             <div class="flex justify-center gap-2.5">
-                <button onclick="window.closeDeleteModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Batal</button>
-                <button onclick="window.confirmDeleteItem()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Ya, Padam</button>
+                <button onclick="window.closeClearBoughtModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Batal</button>
+                <button onclick="window.confirmClearBought()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Ya, Padam Semua</button>
             </div>
         </div>
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-max max-w-[92vw]"></div>
+    <div id="toast-container" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-max max-w-[92vw]"></div>
 
     <!-- Firebase JS SDK v11 Modular CDN -->
     <script type="module">
@@ -504,7 +383,7 @@
             writeBatch
         } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        // Konfigurasi Firebase
+        // Konfigurasi Firebase Projek 'beli-barang-record'
         const firebaseConfig = {
             apiKey: "AIzaSyBxLHFHJBCH8z6rruytg04_hIQFZI2b3MA",
             authDomain: "beli-barang-record.firebaseapp.com",
@@ -523,20 +402,19 @@
         googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         // Kunci LocalStorage
-        const LS_ITEMS_KEY = 'beli_barang_items_v2_guest';
-        const LS_THEME_KEY = 'beli_barang_theme_v2';
-        const LS_NOTIFIED_KEY = 'beli_barang_notified_ids_v2';
+        const LS_ITEMS_KEY = 'beli_barang_simple_v4_guest';
+        const LS_THEME_KEY = 'beli_barang_theme_v4';
 
-        // State Utama
+        // State Aplikasi
         let currentUser = null;
         let items = [];
-        let activeTab = 'all';
         let unsubscribeItems = null;
-        let itemToDeleteId = null;
-        let reminderIntervalId = null;
+        let activeFilterTab = 'all'; // 'all' | 'pending' | 'outofstock' | 'bought'
+        let isSelectMode = false;
+        let selectedIdsForShare = new Set();
 
         // ==========================================
-        // 1. PWA ICON & MANIFEST DINAMIK (iPad/iOS)
+        // 1. PWA ICON & MANIFEST DINAMIK (iPadOS / Mudah Alih)
         // ==========================================
         function setupDynamicPWA() {
             try {
@@ -545,31 +423,29 @@
                 canvas.height = 512;
                 const ctx = canvas.getContext('2d');
 
-                // Latar belakang gradien
                 const grad = ctx.createLinearGradient(0, 0, 512, 512);
-                grad.addColorStop(0, '#4f46e5');
-                grad.addColorStop(1, '#10b981');
+                grad.addColorStop(0, '#10b981');
+                grad.addColorStop(1, '#0d9488');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
                 ctx.roundRect(0, 0, 512, 512, 112);
                 ctx.fill();
 
-                // Ikon Beg Beli-Belah & Loceng Peringatan
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 34;
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
 
-                ctx.strokeRect(136, 190, 240, 205);
+                // Lukis beg beli-belah dengan tanda semak
+                ctx.strokeRect(140, 195, 232, 195);
                 ctx.beginPath();
-                ctx.arc(256, 190, 62, Math.PI, 0, false);
+                ctx.arc(256, 195, 56, Math.PI, 0, false);
                 ctx.stroke();
 
-                // Tanda semak
                 ctx.beginPath();
-                ctx.moveTo(205, 292);
+                ctx.moveTo(206, 292);
                 ctx.lineTo(242, 328);
-                ctx.lineTo(312, 256);
+                ctx.lineTo(310, 256);
                 ctx.stroke();
 
                 const iconDataUrl = canvas.toDataURL('image/png');
@@ -579,11 +455,11 @@
                 const manifest = {
                     name: "Beli Barang Record",
                     short_name: "Beli Barang",
-                    description: "Rekod barang perlu beli, peringatan masa, dan perkongsian WhatsApp.",
+                    description: "Aplikasi senarai beli barang ringkas dan pantas dengan kongsi WhatsApp & Telegram.",
                     start_url: window.location.href,
                     display: "standalone",
                     background_color: "#0f172a",
-                    theme_color: "#4f46e5",
+                    theme_color: "#059669",
                     icons: [
                         {
                             src: iconDataUrl,
@@ -632,57 +508,8 @@
         };
 
         // ==========================================
-        // 3. UTILITI TARIKH, MASA & TOAST
+        // 3. TOAST NOTIFICATION & ESCAPE HTML
         // ==========================================
-        function getLocalDateStr(offsetDays = 0) {
-            const d = new Date();
-            d.setDate(d.getDate() + offsetDays);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function formatDisplayDate(dateStr) {
-            if (!dateStr) return '-';
-            const todayStr = getLocalDateStr(0);
-            const tomorrowStr = getLocalDateStr(1);
-            const yesterdayStr = getLocalDateStr(-1);
-
-            if (dateStr === todayStr) return 'Hari Ini';
-            if (dateStr === tomorrowStr) return 'Esok';
-            if (dateStr === yesterdayStr) return 'Semalam';
-
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
-            const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
-            const mIdx = parseInt(parts[1], 10) - 1;
-            return `${parseInt(parts[2], 10)} ${months[mIdx] || parts[1]} ${parts[0]}`;
-        }
-
-        function formatShortDate(dateStr) {
-            if (!dateStr) return '';
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
-            const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
-            const mIdx = parseInt(parts[1], 10) - 1;
-            return `${parseInt(parts[2], 10)} ${months[mIdx] || parts[1]}`;
-        }
-
-        function formatTime12Hour(time24) {
-            if (!time24) return '';
-            const [hStr, mStr] = time24.split(':');
-            let h = parseInt(hStr, 10);
-            if (isNaN(h)) return time24;
-            let period = 'PG';
-            if (h >= 12 && h < 19) period = 'PTG';
-            else if (h >= 19) period = 'MLM';
-            else if (h === 12) period = 'TGH';
-
-            const h12 = h % 12 === 0 ? 12 : h % 12;
-            return `${h12}:${mStr} ${period}`;
-        }
-
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -692,152 +519,29 @@
                     ? 'bg-amber-600 text-white'
                     : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900';
 
-            toast.className = `${bgClass} px-4 py-2.5 rounded-2xl shadow-xl text-xs sm:text-sm font-semibold flex items-center gap-2 animate-slide-up`;
+            toast.className = `${bgClass} px-4 py-2.5 rounded-2xl shadow-xl text-xs sm:text-sm font-bold flex items-center gap-2 animate-pop-in`;
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
 
             setTimeout(() => {
                 toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3400);
+                toast.style.transition = 'opacity 0.25s ease';
+                setTimeout(() => toast.remove(), 250);
+            }, 2800);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         // ==========================================
-        // 4. SISTEM REMINDER PINTAR & NOTIFIKASI PELAYAR
-        // ==========================================
-        function playGentleChime() {
-            try {
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (!AudioCtx) return;
-                const ctx = new AudioCtx();
-                const now = ctx.currentTime;
-
-                const notes = [587.33, 880.00]; // D5 -> A5 chime
-                notes.forEach((freq, idx) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(freq, now + idx * 0.16);
-
-                    gain.gain.setValueAtTime(0.001, now + idx * 0.16);
-                    gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.16 + 0.04);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.16 + 0.55);
-
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.start(now + idx * 0.16);
-                    osc.stop(now + idx * 0.16 + 0.6);
-                });
-            } catch (e) {
-                console.warn("Web Audio chime blocked:", e);
-            }
-        }
-
-        function updateNotificationButtonUI() {
-            const btn = document.getElementById('btn-notif-perm');
-            const txt = document.getElementById('text-notif-status');
-            if (!('Notification' in window)) {
-                btn.classList.add('hidden');
-                return;
-            }
-            if (Notification.permission === 'granted') {
-                btn.className = "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition";
-                txt.textContent = "Reminder Aktif";
-            } else if (Notification.permission === 'denied') {
-                btn.className = "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-xs font-bold transition";
-                txt.textContent = "Notifikasi Disekat";
-            } else {
-                txt.textContent = "Aktifkan Reminder";
-            }
-        }
-
-        window.requestNotificationPermission = async function () {
-            if (!('Notification' in window)) {
-                showToast("Pelayar ini tidak menyokong notifikasi sistem, tetapi amaran dalam aplikasi tetap aktif!", "warning");
-                playGentleChime();
-                return;
-            }
-            try {
-                const perm = await Notification.requestPermission();
-                updateNotificationButtonUI();
-                if (perm === 'granted') {
-                    playGentleChime();
-                    showToast("Notifikasi reminder diaktifkan!");
-                    new Notification("Beli Barang Record", {
-                        body: "Peringatan beli barang kini aktif untuk peranti anda."
-                    });
-                } else {
-                    showToast("Sila benarkan notifikasi di tetapan pelayar jika mahu amaran pop-up.", "warning");
-                }
-            } catch (err) {
-                console.error("Notification permission error:", err);
-            }
-        };
-
-        function getNotifiedMap() {
-            try {
-                return JSON.parse(localStorage.getItem(LS_NOTIFIED_KEY)) || {};
-            } catch {
-                return {};
-            }
-        }
-
-        function markAsNotified(key) {
-            const map = getNotifiedMap();
-            map[key] = Date.now();
-            localStorage.setItem(LS_NOTIFIED_KEY, JSON.stringify(map));
-        }
-
-        function checkRemindersNow() {
-            const now = new Date();
-            const notifiedMap = getNotifiedMap();
-            const triggeredItems = [];
-
-            items.forEach(item => {
-                if (item.status === 'sudah') return;
-                if (item.reminderEnabled === false) return;
-                if (!item.tarikhRemind || !item.masaRemind) return;
-
-                const remindDateTime = new Date(`${item.tarikhRemind}T${item.masaRemind}:00`);
-                if (isNaN(remindDateTime.getTime())) return;
-
-                // Hanya trigger jika waktu reminder telah tiba (dalam lingkungan 24 jam lepas supaya tidak spam rekod terlalu lama)
-                const diffMs = now.getTime() - remindDateTime.getTime();
-                const uniqueTriggerKey = `${item.id}_${item.tarikhRemind}_${item.masaRemind}`;
-
-                if (diffMs >= 0 && diffMs <= 24 * 60 * 60 * 1000 && !notifiedMap[uniqueTriggerKey]) {
-                    markAsNotified(uniqueTriggerKey);
-                    triggeredItems.push(item);
-                }
-            });
-
-            if (triggeredItems.length > 0) {
-                playGentleChime();
-
-                const namesList = triggeredItems.map(i => `${i.name} (${i.qtyUnit || '1'})`).join(', ');
-                const banner = document.getElementById('reminder-alert-banner');
-                const bannerText = document.getElementById('reminder-alert-text');
-
-                bannerText.textContent = `Masa untuk beli: ${namesList}`;
-                banner.classList.remove('hidden');
-
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    triggeredItems.forEach(item => {
-                        new Notification(`🛒 Reminder Beli: ${item.name}`, {
-                            body: `Kuantiti: ${item.qtyUnit || '1'} • Kategori: ${item.category || 'Umum'}\nTarget Beli: ${formatDisplayDate(item.tarikhBeli)}`
-                        });
-                    });
-                }
-            }
-        }
-
-        window.dismissReminderBanner = function () {
-            document.getElementById('reminder-alert-banner').classList.add('hidden');
-        };
-
-        // ==========================================
-        // 5. LOG MASUK GOOGLE (signInWithPopup SAHAJA)
+        // 4. LOG MASUK GOOGLE (signInWithPopup SAHAJA)
         // ==========================================
         window.loginWithGoogle = async function () {
             try {
@@ -846,7 +550,7 @@
             } catch (error) {
                 console.error("Google Sign-In Error:", error);
                 if (error.code === 'auth/popup-blocked') {
-                    showToast("Popup disekat oleh Safari/Pelayar. Sila benarkan popup.", "error");
+                    showToast("Popup disekat oleh pelayar. Sila benarkan popup.", "error");
                 } else if (error.code !== 'auth/popup-closed-by-user') {
                     showToast("Gagal log masuk: " + error.message, "error");
                 }
@@ -879,9 +583,7 @@
                 userView.classList.remove('hidden');
                 userView.classList.add('flex');
 
-                document.getElementById('user-name').textContent = user.displayName || 'Pengguna Google';
-                document.getElementById('user-email').textContent = user.email || '';
-                document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=4f46e5&color=fff`;
+                document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=059669&color=fff`;
 
                 syncDot.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse shrink-0';
                 syncText.textContent = 'Cloud Sync Aktif';
@@ -895,14 +597,14 @@
                 document.getElementById('btn-sync-local').classList.add('hidden');
 
                 syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0';
-                syncText.textContent = 'Mod Tetamu (Simpanan Lokal)';
+                syncText.textContent = 'Mod Tetamu (Lokal)';
 
                 loadGuestItems();
             }
         });
 
         // ==========================================
-        // 6. SIMPANAN DATA: FIRESTORE & LOCALSTORAGE
+        // 5. SIMPANAN DATA: FIRESTORE & LOCALSTORAGE
         // ==========================================
         function getGuestItemsFromStorage() {
             try {
@@ -918,8 +620,7 @@
 
         function loadGuestItems() {
             items = getGuestItemsFromStorage();
-            refreshUI();
-            checkRemindersNow();
+            renderLists();
         }
 
         function subscribeCloudItems(uid) {
@@ -931,8 +632,8 @@
                     id: docSnap.id,
                     ...docSnap.data()
                 }));
-                refreshUI();
-                checkRemindersNow();
+                items.sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+                renderLists();
             }, (error) => {
                 console.error("Firestore onSnapshot error:", error);
                 showToast("Ralat menyegerak data awan.", "error");
@@ -957,10 +658,7 @@
         window.syncGuestDataToCloud = async function () {
             if (!currentUser) return;
             const guestData = getGuestItemsFromStorage();
-            if (guestData.length === 0) {
-                showToast("Tiada data tetamu untuk dipindahkan.");
-                return;
-            }
+            if (guestData.length === 0) return;
 
             try {
                 const batch = writeBatch(db);
@@ -971,7 +669,6 @@
                     const { id, ...cleanData } = item;
                     batch.set(newDocRef, {
                         ...cleanData,
-                        syncedFromGuest: true,
                         updatedAt: serverTimestamp()
                     });
                 });
@@ -979,7 +676,7 @@
                 await batch.commit();
                 localStorage.removeItem(LS_ITEMS_KEY);
                 checkGuestDataBadge();
-                showToast(`${guestData.length} rekod berjaya dipindahkan ke Cloud!`);
+                showToast(`${guestData.length} barang dipindahkan ke Cloud!`);
             } catch (error) {
                 console.error("Sync error:", error);
                 showToast("Gagal memindahkan data ke Cloud.", "error");
@@ -987,493 +684,376 @@
         };
 
         // ==========================================
-        // 7. CRUD REKOD BARANG & REMINDER
+        // 6. TAMBAH, TICK, TIADA STOK, EDIT & PADAM
         // ==========================================
-        window.toggleReminderFields = function () {
-            const isEnabled = document.getElementById('item-enable-reminder').checked;
-            const container = document.getElementById('reminder-fields-container');
-            if (isEnabled) {
-                container.classList.remove('hidden');
-                const tarikhBeli = document.getElementById('item-tarikh-beli').value || getLocalDateStr(0);
-                const tarikhRemindEl = document.getElementById('item-tarikh-remind');
-                if (!tarikhRemindEl.value) {
-                    tarikhRemindEl.value = tarikhBeli;
-                }
-            } else {
-                container.classList.add('hidden');
-            }
+        window.setQuickQty = function (val) {
+            const qtyInput = document.getElementById('input-item-qty');
+            qtyInput.value = val;
+            document.getElementById('input-item-name').focus();
         };
 
-        window.syncDefaultRemindDate = function () {
-            const isEnabled = document.getElementById('item-enable-reminder').checked;
-            if (!isEnabled) return;
-            const tarikhBeli = document.getElementById('item-tarikh-beli').value;
-            const tarikhRemindEl = document.getElementById('item-tarikh-remind');
-            if (tarikhBeli && !tarikhRemindEl.value) {
-                tarikhRemindEl.value = tarikhBeli;
-            }
-        };
-
-        window.setQuickRemindPreset = function (preset) {
-            const tarikhBeli = document.getElementById('item-tarikh-beli').value || getLocalDateStr(0);
-            const parts = tarikhBeli.split('-').map(Number);
-            const d = new Date(parts[0], parts[1] - 1, parts[2]);
-
-            if (preset === 'day_before') {
-                d.setDate(d.getDate() - 1);
-            }
-
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            document.getElementById('item-tarikh-remind').value = `${y}-${m}-${day}`;
-        };
-
-        window.openItemModal = function (editId = null) {
-            const modal = document.getElementById('item-modal');
-            const title = document.getElementById('item-modal-title');
-            const form = document.getElementById('item-form');
-            const reminderToggle = document.getElementById('item-enable-reminder');
-            form.reset();
-
-            if (editId) {
-                const target = items.find(i => i.id === editId);
-                if (!target) return;
-
-                const hasReminder = Boolean(target.tarikhRemind && target.masaRemind && target.reminderEnabled !== false);
-                title.innerHTML = `<i data-lucide="edit-3" class="w-5 h-5 text-indigo-600"></i><span>Kemaskini Barang</span>`;
-                document.getElementById('item-id').value = target.id;
-                document.getElementById('item-name').value = target.name || '';
-                document.getElementById('item-qty-unit').value = target.qtyUnit || '1';
-                document.getElementById('item-category').value = target.category || 'Barang Dapur';
-                document.getElementById('item-tarikh-beli').value = target.tarikhBeli || getLocalDateStr(0);
-                reminderToggle.checked = hasReminder;
-                document.getElementById('item-tarikh-remind').value = hasReminder ? target.tarikhRemind : '';
-                document.getElementById('item-masa-remind').value = hasReminder ? target.masaRemind : '17:00';
-                document.getElementById('item-notes').value = target.notes || '';
-                document.getElementById('item-status').value = target.status || 'belum';
-            } else {
-                const today = getLocalDateStr(0);
-                title.innerHTML = `<i data-lucide="package-plus" class="w-5 h-5 text-indigo-600"></i><span>Tambah Barang Perlu Beli</span>`;
-                document.getElementById('item-id').value = '';
-                document.getElementById('item-qty-unit').value = '1';
-                document.getElementById('item-tarikh-beli').value = today;
-                reminderToggle.checked = false;
-                document.getElementById('item-tarikh-remind').value = '';
-                document.getElementById('item-masa-remind').value = '17:00';
-                document.getElementById('item-status').value = 'belum';
-            }
-
-            window.toggleReminderFields();
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            lucide.createIcons();
-        };
-
-        window.closeItemModal = function () {
-            const modal = document.getElementById('item-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
-
-        window.handleSaveItem = async function (event) {
+        window.handleQuickAdd = async function (event) {
             event.preventDefault();
+            const nameInput = document.getElementById('input-item-name');
+            const qtyInput = document.getElementById('input-item-qty');
 
-            const id = document.getElementById('item-id').value;
-            const name = document.getElementById('item-name').value.trim();
-            const qtyUnit = document.getElementById('item-qty-unit').value.trim() || '1';
-            const category = document.getElementById('item-category').value;
-            const tarikhBeli = document.getElementById('item-tarikh-beli').value;
-            const reminderEnabled = document.getElementById('item-enable-reminder').checked;
-            const tarikhRemind = reminderEnabled ? document.getElementById('item-tarikh-remind').value : '';
-            const masaRemind = reminderEnabled ? document.getElementById('item-masa-remind').value : '';
-            const notes = document.getElementById('item-notes').value.trim();
-            const status = document.getElementById('item-status').value;
+            const name = nameInput.value.trim();
+            const qty = qtyInput.value.trim() || '1';
 
-            if (!name || !tarikhBeli) {
-                showToast("Sila isi Nama Barang dan Tarikh Perlu Beli.", "warning");
-                return;
-            }
+            if (!name) return;
 
-            const itemData = {
+            const nowMs = Date.now();
+            const newItem = {
                 name,
-                qtyUnit,
-                category,
-                tarikhBeli,
-                reminderEnabled: Boolean(reminderEnabled && tarikhRemind),
-                tarikhRemind: (reminderEnabled && tarikhRemind) ? tarikhRemind : '',
-                masaRemind: (reminderEnabled && tarikhRemind) ? (masaRemind || '17:00') : '',
-                notes,
-                status
+                qty,
+                bought: false,
+                outOfStock: false,
+                note: '',
+                createdAtMs: nowMs
             };
+
+            nameInput.value = '';
+            qtyInput.value = '1';
+            nameInput.focus();
 
             try {
                 if (currentUser) {
                     const colRef = collection(db, 'users', currentUser.uid, 'items');
-                    if (id) {
-                        await updateDoc(doc(colRef, id), {
-                            ...itemData,
-                            updatedAt: serverTimestamp()
-                        });
-                        showToast("Rekod barang dikemaskini!");
-                    } else {
-                        await addDoc(colRef, {
-                            ...itemData,
-                            createdAt: serverTimestamp(),
-                            updatedAt: serverTimestamp()
-                        });
-                        showToast("Barang ditambah ke senarai!");
-                    }
+                    await addDoc(colRef, {
+                        ...newItem,
+                        createdAt: serverTimestamp()
+                    });
                 } else {
-                    if (id) {
-                        items = items.map(i => i.id === id ? { ...i, ...itemData } : i);
-                        showToast("Rekod lokal dikemaskini!");
-                    } else {
-                        const newLocal = {
-                            id: 'local_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-                            ...itemData,
-                            createdAt: new Date().toISOString()
-                        };
-                        items.unshift(newLocal);
-                        showToast("Disimpan secara lokal (Mod Tetamu)!");
-                    }
+                    const localItem = {
+                        id: 'local_' + nowMs + '_' + Math.random().toString(36).substring(2, 6),
+                        ...newItem
+                    };
+                    items.unshift(localItem);
                     saveGuestItemsToStorage(items);
-                    refreshUI();
+                    renderLists();
                 }
-
-                window.closeItemModal();
-                checkRemindersNow();
+                showToast(`Ditambah: ${name} (${qty})`);
             } catch (error) {
-                console.error("Save error:", error);
-                showToast("Gagal menyimpan: " + error.message, "error");
+                console.error("Add error:", error);
+                showToast("Gagal menambah barang: " + error.message, "error");
             }
         };
 
-        window.toggleItemStatus = async function (id) {
+        window.toggleBought = async function (id) {
             const target = items.find(i => i.id === id);
             if (!target) return;
 
-            const nextStatus = target.status === 'sudah' ? 'belum' : 'sudah';
+            const nextBought = !target.bought;
+            if (nextBought) {
+                selectedIdsForShare.delete(id);
+            }
 
             try {
                 if (currentUser) {
-                    const docRef = doc(db, 'users', currentUser.uid, 'items', id);
-                    await updateDoc(docRef, {
-                        status: nextStatus,
+                    await updateDoc(doc(db, 'users', currentUser.uid, 'items', id), {
+                        bought: nextBought,
                         updatedAt: serverTimestamp()
                     });
                 } else {
-                    items = items.map(i => i.id === id ? { ...i, status: nextStatus } : i);
+                    items = items.map(i => i.id === id ? { ...i, bought: nextBought } : i);
                     saveGuestItemsToStorage(items);
-                    refreshUI();
+                    renderLists();
                 }
-                showToast(nextStatus === 'sudah' ? `Selesai dibeli: ${target.name}` : `Ditanda belum beli: ${target.name}`);
+                showToast(nextBought ? `✅ Dah beli: ${target.name}` : `↩️ Belum beli: ${target.name}`);
             } catch (error) {
-                console.error("Toggle status error:", error);
-                showToast("Gagal mengemaskini status.", "error");
+                console.error("Toggle bought error:", error);
+                showToast("Gagal kemaskini status.", "error");
             }
         };
 
-        window.openDeleteModal = function (id) {
+        window.toggleOutOfStock = async function (id) {
             const target = items.find(i => i.id === id);
             if (!target) return;
-            itemToDeleteId = id;
-            document.getElementById('delete-item-name').textContent = `"${target.name}"`;
-            const modal = document.getElementById('delete-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        };
 
-        window.closeDeleteModal = function () {
-            itemToDeleteId = null;
-            const modal = document.getElementById('delete-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
+            const nextOutOfStock = !target.outOfStock;
 
-        window.confirmDeleteItem = async function () {
-            if (!itemToDeleteId) return;
             try {
                 if (currentUser) {
-                    await deleteDoc(doc(db, 'users', currentUser.uid, 'items', itemToDeleteId));
+                    await updateDoc(doc(db, 'users', currentUser.uid, 'items', id), {
+                        outOfStock: nextOutOfStock,
+                        updatedAt: serverTimestamp()
+                    });
                 } else {
-                    items = items.filter(i => i.id !== itemToDeleteId);
+                    items = items.map(i => i.id === id ? { ...i, outOfStock: nextOutOfStock } : i);
                     saveGuestItemsToStorage(items);
-                    refreshUI();
+                    renderLists();
+                }
+                showToast(
+                    nextOutOfStock
+                        ? `❌ Ditanda Tiada Stok: ${target.name}`
+                        : `✅ Stok ada semula: ${target.name}`,
+                    nextOutOfStock ? 'warning' : 'success'
+                );
+            } catch (error) {
+                console.error("Toggle outOfStock error:", error);
+                showToast("Gagal kemaskini stok.", "error");
+            }
+        };
+
+        window.deleteSingleItem = async function (id) {
+            selectedIdsForShare.delete(id);
+            try {
+                if (currentUser) {
+                    await deleteDoc(doc(db, 'users', currentUser.uid, 'items', id));
+                } else {
+                    items = items.filter(i => i.id !== id);
+                    saveGuestItemsToStorage(items);
+                    renderLists();
                 }
                 showToast("Barang dipadam.");
-                window.closeDeleteModal();
             } catch (error) {
                 console.error("Delete error:", error);
                 showToast("Gagal memadam barang.", "error");
             }
         };
 
-        // ==========================================
-        // 8. PENAPIS PINTAR & PAPARAN SENARAI KAD
-        // ==========================================
-        function classifyItem(item) {
-            const todayStr = getLocalDateStr(0);
-            const hasActiveReminderToday = item.reminderEnabled !== false && item.tarikhRemind === todayStr;
-            if (item.status === 'sudah') return 'bought';
-            if (item.tarikhBeli && item.tarikhBeli < todayStr) return 'overdue';
-            if (item.tarikhBeli === todayStr || hasActiveReminderToday) return 'today';
-            return 'upcoming';
-        }
+        // Modal Edit
+        window.openEditModal = function (id) {
+            const target = items.find(i => i.id === id);
+            if (!target) return;
 
-        window.setActiveTab = function (tabName) {
-            activeTab = tabName;
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                if (btn.dataset.tab === tabName) {
-                    btn.className = "tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition bg-indigo-600 text-white shadow-sm";
-                } else {
-                    btn.className = "tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700";
-                }
-            });
-            window.renderItems();
-        };
+            document.getElementById('edit-item-id').value = target.id;
+            document.getElementById('edit-item-name').value = target.name || '';
+            document.getElementById('edit-item-qty').value = target.qty || '1';
+            document.getElementById('edit-item-outofstock').checked = Boolean(target.outOfStock);
+            document.getElementById('edit-item-note').value = target.note || '';
 
-        function refreshUI() {
-            const todayCount = items.filter(i => classifyItem(i) === 'today').length;
-            const overdueCount = items.filter(i => classifyItem(i) === 'overdue').length;
-            const upcomingCount = items.filter(i => classifyItem(i) === 'upcoming').length;
-            const boughtCount = items.filter(i => classifyItem(i) === 'bought').length;
-
-            // Update Summary Cards
-            document.getElementById('count-today').textContent = todayCount;
-            document.getElementById('count-overdue').textContent = overdueCount;
-            document.getElementById('count-upcoming').textContent = upcomingCount;
-            document.getElementById('count-bought').textContent = boughtCount;
-
-            // Update Tab Badges
-            document.getElementById('tab-badge-all').textContent = items.length;
-            document.getElementById('tab-badge-today').textContent = todayCount;
-            document.getElementById('tab-badge-overdue').textContent = overdueCount;
-            document.getElementById('tab-badge-upcoming').textContent = upcomingCount;
-            document.getElementById('tab-badge-bought').textContent = boughtCount;
-
-            window.renderItems();
-        }
-
-        window.renderItems = function () {
-            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
-            const categoryFilter = document.getElementById('filter-category').value;
-            const todayStr = getLocalDateStr(0);
-            const tomorrowStr = getLocalDateStr(1);
-
-            const filtered = items.filter(item => {
-                const group = classifyItem(item);
-                const matchTab = activeTab === 'all' || group === activeTab;
-                const matchCategory = categoryFilter === 'Semua' || item.category === categoryFilter;
-                const matchSearch = !searchQuery ||
-                    (item.name || '').toLowerCase().includes(searchQuery) ||
-                    (item.category || '').toLowerCase().includes(searchQuery) ||
-                    (item.notes || '').toLowerCase().includes(searchQuery);
-
-                return matchTab && matchCategory && matchSearch;
-            });
-
-            // Susun keutamaan: Overdue -> Today -> Upcoming -> Bought
-            const priorityOrder = { overdue: 1, today: 2, upcoming: 3, bought: 4 };
-            filtered.sort((a, b) => {
-                const pA = priorityOrder[classifyItem(a)] || 5;
-                const pB = priorityOrder[classifyItem(b)] || 5;
-                if (pA !== pB) return pA - pB;
-                return (a.tarikhBeli || '').localeCompare(b.tarikhBeli || '');
-            });
-
-            const listContainer = document.getElementById('items-list');
-            const emptyState = document.getElementById('empty-state');
-            document.getElementById('list-showing-count').textContent = filtered.length;
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-
-            listContainer.innerHTML = filtered.map(item => {
-                const isBought = item.status === 'sudah';
-                const group = classifyItem(item);
-
-                // Visual Badge untuk Tarikh Beli
-                let dateBadgeHTML = '';
-                if (isBought) {
-                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400">SUDAH BELI</span>`;
-                } else if (group === 'overdue') {
-                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950/90 dark:text-rose-400 animate-soft-pulse">LEWAT TARIKH / OVERDUE (${formatShortDate(item.tarikhBeli)})</span>`;
-                } else if (item.tarikhBeli === todayStr) {
-                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 text-indigo-700 dark:bg-indigo-950/90 dark:text-indigo-300">HARI INI</span>`;
-                } else if (item.tarikhBeli === tomorrowStr) {
-                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/90 dark:text-amber-300">ESOK</span>`;
-                } else {
-                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">${formatDisplayDate(item.tarikhBeli)}</span>`;
-                }
-
-                // Paparan Waktu Reminder
-                const hasReminder = item.reminderEnabled !== false && item.tarikhRemind && item.masaRemind;
-                const reminderText = hasReminder
-                    ? `Remind: ${formatShortDate(item.tarikhRemind)}, ${formatTime12Hour(item.masaRemind)}`
-                    : 'Tiada reminder';
-
-                const cardBorderClass = isBought
-                    ? 'border-slate-200/70 dark:border-slate-800/80 opacity-80'
-                    : group === 'overdue'
-                        ? 'border-rose-300 dark:border-rose-800/80'
-                        : group === 'today'
-                            ? 'border-indigo-300 dark:border-indigo-800/80'
-                            : 'border-slate-200/90 dark:border-slate-800';
-
-                return `
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border ${cardBorderClass} shadow-sm hover:shadow-md transition flex flex-col justify-between gap-3">
-                        <div class="flex items-start gap-3">
-                            <!-- Checkbox Tandakan Sudah Beli -->
-                            <button onclick="window.toggleItemStatus('${item.id}')" title="${isBought ? 'Tandakan Belum Beli' : 'Tandakan Sudah Beli'}" class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition ${isBought ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-500'}">
-                                ${isBought ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
-                            </button>
-
-                            <!-- Kandungan Utama Kad -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-start justify-between gap-2">
-                                    <h4 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white leading-snug ${isBought ? 'line-through text-slate-400 dark:text-slate-500' : ''}">
-                                        ${escapeHTML(item.name)}
-                                    </h4>
-                                    <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 shrink-0">
-                                        ${escapeHTML(item.qtyUnit || '1')}
-                                    </span>
-                                </div>
-
-                                <!-- Lencana Tarikh & Kategori -->
-                                <div class="flex flex-wrap items-center gap-1.5 mt-2">
-                                    ${dateBadgeHTML}
-                                    <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                                        ${escapeHTML(item.category || 'Lain-lain')}
-                                    </span>
-                                </div>
-
-                                <!-- Catatan jika ada -->
-                                ${item.notes ? `
-                                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2">
-                                        "${escapeHTML(item.notes)}"
-                                    </p>
-                                ` : ''}
-                            </div>
-                        </div>
-
-                        <!-- Footer Kad: Masa Reminder & Butang Edit/Padam -->
-                        <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
-                            <div class="flex items-center gap-1.5 ${hasReminder && !isBought ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-400'}">
-                                <i data-lucide="bell" class="w-3.5 h-3.5 shrink-0"></i>
-                                <span class="truncate">${reminderText}</span>
-                            </div>
-
-                            <div class="flex items-center gap-1 shrink-0">
-                                <button onclick="window.openItemModal('${item.id}')" class="p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition" title="Edit">
-                                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button onclick="window.openDeleteModal('${item.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 transition" title="Padam">
-                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
+            const modal = document.getElementById('edit-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
             lucide.createIcons();
         };
 
-        function escapeHTML(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // ==========================================
-        // 9. JANA MESEJ & KONGSI KE WHATSAPP
-        // ==========================================
-        function buildWhatsAppMessage(mode = 'today') {
-            const todayStr = getLocalDateStr(0);
-            let targetList = [];
-            let titleText = '';
-
-            if (mode === 'today') {
-                // Barang belum dibeli untuk hari ini / lewat; jika tiada khusus hari ini, ambil semua yang belum beli
-                const todaySpecific = items.filter(i => {
-                    const hasActiveReminderToday = i.reminderEnabled !== false && i.tarikhRemind === todayStr;
-                    return i.status !== 'sudah' && (i.tarikhBeli <= todayStr || hasActiveReminderToday);
-                });
-
-                if (todaySpecific.length > 0) {
-                    targetList = todaySpecific;
-                    titleText = `*🛒 SENARAI BARANG PERLU BELI HARI INI (${formatShortDate(todayStr)})*`;
-                } else {
-                    targetList = items.filter(i => i.status !== 'sudah');
-                    titleText = `*🛒 SENARAI BARANG BELUM BELI (${formatShortDate(todayStr)})*`;
-                }
-            } else {
-                targetList = items.filter(i => i.status !== 'sudah');
-                titleText = `*🛒 SEMUA SENARAI BARANG BELUM BELI*`;
-            }
-
-            if (targetList.length === 0) return null;
-
-            let msg = `${titleText}\n`;
-            msg += `----------------------------------\n`;
-
-            targetList.forEach((item, idx) => {
-                const qtyLabel = item.qtyUnit ? ` (${item.qtyUnit})` : '';
-                const catLabel = item.category ? ` [${item.category}]` : '';
-                const remindLabel = (item.reminderEnabled !== false && item.tarikhRemind && item.masaRemind)
-                    ? ` ⏰ Remind: ${formatShortDate(item.tarikhRemind)}, ${formatTime12Hour(item.masaRemind)}`
-                    : '';
-                const noteLabel = item.notes ? `\n   _Catatan: ${item.notes}_` : '';
-
-                msg += `${idx + 1}. *${item.name}*${qtyLabel}${catLabel}\n`;
-                msg += `   📅 Target: ${formatDisplayDate(item.tarikhBeli)}${remindLabel}${noteLabel}\n`;
-            });
-
-            msg += `----------------------------------\n`;
-            msg += `Jumlah: *${targetList.length} barang*`;
-            return msg;
-        }
-
-        window.shareWhatsAppList = function (mode = 'today') {
-            const message = buildWhatsAppMessage(mode);
-            if (!message) {
-                showToast(
-                    mode === 'today'
-                        ? "Tiada barang perlu dibeli untuk hari ini!"
-                        : "Tiada barang dalam senarai belum beli!",
-                    "warning"
-                );
-                return;
-            }
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
+        window.closeEditModal = function () {
+            const modal = document.getElementById('edit-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         };
 
-        window.copyWhatsAppText = function (mode = 'today') {
-            const message = buildWhatsAppMessage(mode);
-            if (!message) {
-                showToast("Tiada senarai hari ini untuk disalin.", "warning");
+        window.handleSaveEdit = async function (event) {
+            event.preventDefault();
+            const id = document.getElementById('edit-item-id').value;
+            const name = document.getElementById('edit-item-name').value.trim();
+            const qty = document.getElementById('edit-item-qty').value.trim() || '1';
+            const outOfStock = document.getElementById('edit-item-outofstock').checked;
+            const note = document.getElementById('edit-item-note').value.trim();
+
+            if (!name) return;
+
+            const updates = { name, qty, outOfStock, note };
+
+            try {
+                if (currentUser) {
+                    await updateDoc(doc(db, 'users', currentUser.uid, 'items', id), {
+                        ...updates,
+                        updatedAt: serverTimestamp()
+                    });
+                } else {
+                    items = items.map(i => i.id === id ? { ...i, ...updates } : i);
+                    saveGuestItemsToStorage(items);
+                    renderLists();
+                }
+                window.closeEditModal();
+                showToast("Perubahan disimpan!");
+            } catch (error) {
+                console.error("Edit save error:", error);
+                showToast("Gagal menyimpan perubahan.", "error");
+            }
+        };
+
+        // Modal Padam Semua Dah Beli
+        window.openClearBoughtModal = function () {
+            const modal = document.getElementById('clear-bought-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeClearBoughtModal = function () {
+            const modal = document.getElementById('clear-bought-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.confirmClearBought = async function () {
+            const boughtItems = items.filter(i => i.bought);
+            if (boughtItems.length === 0) {
+                window.closeClearBoughtModal();
                 return;
             }
+
+            try {
+                if (currentUser) {
+                    const batch = writeBatch(db);
+                    boughtItems.forEach(item => {
+                        batch.delete(doc(db, 'users', currentUser.uid, 'items', item.id));
+                    });
+                    await batch.commit();
+                } else {
+                    items = items.filter(i => !i.bought);
+                    saveGuestItemsToStorage(items);
+                    renderLists();
+                }
+                window.closeClearBoughtModal();
+                showToast(`${boughtItems.length} barang dah beli dipadam.`);
+            } catch (error) {
+                console.error("Clear bought error:", error);
+                showToast("Gagal memadam rekod dah beli.", "error");
+            }
+        };
+
+        // ==========================================
+        // 7. PENAPIS TAB & MOD PILIH BARANG KIRIM
+        // ==========================================
+        window.setFilterTab = function (tab) {
+            activeFilterTab = tab;
+            const tabs = ['all', 'pending', 'outofstock', 'bought'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tab) {
+                    btn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm";
+                } else {
+                    btn.className = "px-3.5 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800";
+                }
+            });
+            renderLists();
+        };
+
+        window.toggleSelectMode = function () {
+            isSelectMode = !isSelectMode;
+            const btn = document.getElementById('btn-toggle-select-mode');
+            const btnText = document.getElementById('text-toggle-select-mode');
+            const actionsBar = document.getElementById('select-mode-actions');
+            const helperText = document.getElementById('share-helper-text');
+
+            if (isSelectMode) {
+                // Pastikan paparan menunjukkan item belum beli supaya mudah dipilih
+                if (activeFilterTab === 'bought') {
+                    window.setFilterTab('pending');
+                }
+                btn.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white shadow-sm transition";
+                btnText.textContent = "Selesai Memilih";
+                actionsBar.classList.remove('hidden');
+                actionsBar.classList.add('flex');
+                helperText.innerHTML = `Tick kotak <strong class="text-indigo-600 dark:text-indigo-400">Pilih Kirim</strong> pada barang yang nak dihantar sahaja.`;
+            } else {
+                selectedIdsForShare.clear();
+                btn.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 transition shadow-sm";
+                btnText.textContent = "Pilih Barang Tertentu";
+                actionsBar.classList.add('hidden');
+                actionsBar.classList.remove('flex');
+                helperText.innerHTML = `Hantar <strong class="text-emerald-700 dark:text-emerald-400">semua barang belum beli</strong> ke WhatsApp / Telegram, atau pilih item tertentu sahaja.`;
+            }
+
+            updateSelectedCountUI();
+            renderLists();
+        };
+
+        window.toggleSelectItemForShare = function (id) {
+            if (selectedIdsForShare.has(id)) {
+                selectedIdsForShare.delete(id);
+            } else {
+                selectedIdsForShare.add(id);
+            }
+            updateSelectedCountUI();
+            renderLists();
+        };
+
+        window.selectAllPending = function () {
+            items.filter(i => !i.bought).forEach(i => selectedIdsForShare.add(i.id));
+            updateSelectedCountUI();
+            renderLists();
+        };
+
+        window.clearSelection = function () {
+            selectedIdsForShare.clear();
+            updateSelectedCountUI();
+            renderLists();
+        };
+
+        function updateSelectedCountUI() {
+            document.getElementById('selected-count').textContent = selectedIdsForShare.size;
+        }
+
+        function buildFormattedShareMessage() {
+            const pendingItems = items.filter(i => !i.bought);
+            let targetList = [];
+
+            if (isSelectMode && selectedIdsForShare.size > 0) {
+                targetList = pendingItems.filter(i => selectedIdsForShare.has(i.id));
+            } else if (isSelectMode && selectedIdsForShare.size === 0) {
+                return { error: "Sila tick sekurang-kurangnya 1 barang untuk dihantar!" };
+            } else {
+                targetList = pendingItems;
+            }
+
+            if (targetList.length === 0) {
+                return { error: "Tiada barang belum beli dalam senarai untuk dihantar!" };
+            }
+
+            const style = document.getElementById('share-style').value;
+            let headerTitle = "";
+            let footerLine = "";
+
+            if (style === 'tolong') {
+                headerTitle = "Assalamualaikum / Hi, tolong belikan barang ni jap:\n\n";
+                footerLine = "\n\nTerima kasih 🙏";
+            } else if (style === 'senarai') {
+                headerTitle = "🛒 *Senarai barang nak beli:*\n\n";
+                footerLine = "";
+            } else {
+                headerTitle = "";
+                footerLine = "";
+            }
+
+            const lines = targetList.map(item => {
+                const icon = item.outOfStock ? "❌" : "⬜";
+                const qtyText = item.qty ? ` (${item.qty})` : "";
+                const stockTag = item.outOfStock ? " - *[Tiada Stok]*" : "";
+                const noteTag = item.note ? `\n   _Nota: ${item.note}_` : "";
+                return `${icon} ${item.name}${qtyText}${stockTag}${noteTag}`;
+            });
+
+            const fullText = `${headerTitle}${lines.join('\n')}${footerLine}`;
+            return { text: fullText };
+        }
+
+        window.shareList = function (platform) {
+            const result = buildFormattedShareMessage();
+            if (result.error) {
+                showToast(result.error, "warning");
+                return;
+            }
+
+            const encodedText = encodeURIComponent(result.text);
+
+            if (platform === 'whatsapp') {
+                window.open(`https://wa.me/?text=${encodedText}`, '_blank');
+            } else if (platform === 'telegram') {
+                window.open(`https://t.me/share/url?url=&text=${encodedText}`, '_blank');
+            }
+        };
+
+        window.copyShareText = function () {
+            const result = buildFormattedShareMessage();
+            if (result.error) {
+                showToast(result.error, "warning");
+                return;
+            }
+
             const tempTextarea = document.createElement('textarea');
-            tempTextarea.value = message;
+            tempTextarea.value = result.text;
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.left = '-9999px';
             document.body.appendChild(tempTextarea);
             tempTextarea.select();
             try {
                 document.execCommand('copy');
-                showToast("Teks senarai hari ini berjaya disalin!");
+                showToast("Senarai barang berjaya disalin!");
             } catch (err) {
                 showToast("Gagal menyalin teks.", "error");
             }
@@ -1481,23 +1061,164 @@
         };
 
         // ==========================================
-        // 10. PERMULAAN APLIKASI (ON LOAD)
+        // 8. PAPARAN SENARAI (RENDER UI)
+        // ==========================================
+        function renderLists() {
+            const pendingItems = items.filter(i => !i.bought);
+            const outOfStockItems = items.filter(i => !i.bought && i.outOfStock);
+            const boughtItems = items.filter(i => i.bought);
+
+            // Kemaskini lencana kiraan pada Tab
+            document.getElementById('count-all').textContent = items.length;
+            document.getElementById('count-pending').textContent = pendingItems.length;
+            document.getElementById('count-outofstock').textContent = outOfStockItems.length;
+            document.getElementById('count-bought').textContent = boughtItems.length;
+
+            // Tunjuk atau sorok butang Padam Semua Dah Beli
+            const btnClearBought = document.getElementById('btn-clear-bought');
+            if (boughtItems.length > 0) {
+                btnClearBought.classList.remove('hidden');
+                btnClearBought.classList.add('flex');
+            } else {
+                btnClearBought.classList.add('hidden');
+                btnClearBought.classList.remove('flex');
+            }
+
+            // Tapis senarai mengikut tab aktif
+            let filteredItems = [];
+            if (activeFilterTab === 'pending') {
+                filteredItems = pendingItems;
+            } else if (activeFilterTab === 'outofstock') {
+                filteredItems = outOfStockItems;
+            } else if (activeFilterTab === 'bought') {
+                filteredItems = boughtItems;
+            } else {
+                // Untuk tab 'Semua', letakkan Belum Beli di atas dan Dah Beli di bawah
+                filteredItems = [...pendingItems, ...boughtItems];
+            }
+
+            const container = document.getElementById('items-list-container');
+            const emptyState = document.getElementById('empty-list-state');
+            const emptyTitle = document.getElementById('empty-state-title');
+            const emptyDesc = document.getElementById('empty-state-desc');
+
+            if (filteredItems.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+
+                if (activeFilterTab === 'pending') {
+                    emptyTitle.textContent = "Semua Barang Dah Dibeli!";
+                    emptyDesc.textContent = "Tiada lagi barang dalam senarai belum beli.";
+                } else if (activeFilterTab === 'outofstock') {
+                    emptyTitle.textContent = "Tiada Barang Habis Stok";
+                    emptyDesc.textContent = "Semua barang belum beli tidak bertanda Tiada Stok.";
+                } else if (activeFilterTab === 'bought') {
+                    emptyTitle.textContent = "Belum Ada Barang Ditanda Dah Beli";
+                    emptyDesc.textContent = "Tick kotak pada senarai barang apabila anda selesai membelinya.";
+                } else {
+                    emptyTitle.textContent = "Senarai Masih Kosong";
+                    emptyDesc.textContent = "Taip nama barang di kotak atas untuk mula mencatat barang nak beli.";
+                }
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = filteredItems.map(item => {
+                    if (item.bought) {
+                        return `
+                            <div class="rounded-2xl p-3.5 border border-slate-200/70 dark:border-slate-800/70 bg-slate-100/80 dark:bg-slate-900/50 flex items-center justify-between gap-3 opacity-80 transition">
+                                <div onclick="window.toggleBought('${item.id}')" class="flex items-center gap-3 min-w-0 flex-1 cursor-pointer select-none">
+                                    <button type="button" title="Tandakan Belum Beli" class="w-7 h-7 rounded-xl bg-emerald-500 border-2 border-emerald-500 text-white flex items-center justify-center shrink-0">
+                                        <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
+                                    </button>
+                                    <div class="min-w-0 flex-1">
+                                        <span class="text-sm sm:text-base font-bold line-through text-slate-500 dark:text-slate-400 break-words">
+                                            ${escapeHTML(item.name)}
+                                        </span>
+                                        <span class="ml-1.5 text-xs font-semibold text-slate-400">
+                                            (${escapeHTML(item.qty || '1')})
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button type="button" onclick="window.deleteSingleItem('${item.id}')" title="Padam" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/60 transition shrink-0">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    const isSelected = selectedIdsForShare.has(item.id);
+                    const cardRing = isSelectMode && isSelected
+                        ? 'border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-50/30 dark:bg-indigo-950/20'
+                        : item.outOfStock
+                            ? 'border-rose-300 dark:border-rose-900/70 bg-white dark:bg-slate-900'
+                            : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900';
+
+                    return `
+                        <div class="rounded-2xl p-3.5 sm:p-4 border ${cardRing} shadow-sm transition flex items-center justify-between gap-3">
+                            <!-- Kiri: Checkbox Dah Beli atau Pilih Kirim -->
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                ${isSelectMode ? `
+                                    <button type="button" onclick="window.toggleSelectItemForShare('${item.id}')" title="Pilih untuk kirim" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center shrink-0 transition ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-slate-800'}">
+                                        ${isSelected ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
+                                    </button>
+                                ` : `
+                                    <button type="button" onclick="window.toggleBought('${item.id}')" title="Tandakan Dah Beli" class="w-7 h-7 rounded-xl border-2 border-slate-300 dark:border-slate-600 hover:border-emerald-500 flex items-center justify-center shrink-0 transition active:scale-90">
+                                    </button>
+                                `}
+
+                                <!-- Nama Barang, Kuantiti & Status Tiada Stok -->
+                                <div onclick="${isSelectMode ? `window.toggleSelectItemForShare('${item.id}')` : `window.toggleBought('${item.id}')`}" class="min-w-0 flex-1 cursor-pointer select-none">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white break-words">
+                                            ${escapeHTML(item.name)}
+                                        </span>
+                                        <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300">
+                                            ${escapeHTML(item.qty || '1')}
+                                        </span>
+                                        ${item.outOfStock ? `
+                                            <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400">
+                                                Tiada Stok
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    ${item.note ? `
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 italic">
+                                            ${escapeHTML(item.note)}
+                                        </p>
+                                    ` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Kanan: Butang Tiada Stok, Edit & Padam -->
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button type="button" onclick="window.toggleOutOfStock('${item.id}')" title="${item.outOfStock ? 'Tandakan Ada Stok' : 'Tandakan Kedai Tiada Stok'}" class="px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold transition ${item.outOfStock ? 'bg-rose-600 text-white shadow-sm' : 'bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/60 text-slate-600 dark:text-slate-300 hover:text-rose-600'}">
+                                    ${item.outOfStock ? 'Habis' : 'Tiada Stok'}
+                                </button>
+
+                                <button type="button" onclick="window.openEditModal('${item.id}')" title="Edit Barang" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-emerald-600 dark:text-slate-400 transition">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+
+                                <button type="button" onclick="window.deleteSingleItem('${item.id}')" title="Padam" class="p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/60 text-slate-400 hover:text-rose-600 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 9. PERMULAAN APLIKASI
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            const todayFormatted = formatDisplayDate(getLocalDateStr(0)) + ' (' + formatShortDate(getLocalDateStr(0)) + ')';
-            document.getElementById('header-today-date').textContent = todayFormatted;
-
             initTheme();
             setupDynamicPWA();
-            updateNotificationButtonUI();
             lucide.createIcons();
-
-            // Muat data lokal dahulu sebelum pengesahan Firebase selesai
             loadGuestItems();
-
-            // Mulakan semakan reminder setiap 30 saat
-            if (reminderIntervalId) clearInterval(reminderIntervalId);
-            reminderIntervalId = setInterval(checkRemindersNow, 30000);
         });
     </script>
 </body>
