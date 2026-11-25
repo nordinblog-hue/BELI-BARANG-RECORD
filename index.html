@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="ms" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Beli Barang">
+    <meta name="theme-color" content="#4f46e5">
+    <title>Beli Barang Record — Senarai Belian & Peringatan Pintar</title>
+
+    <!-- Dynamic PWA Manifest & Apple Touch Icon (Populated via JS Canvas) -->
+    <link id="pwa-manifest" rel="manifest" href="">
+    <link id="apple-touch-icon" rel="apple-touch-icon" href="">
+    <link id="favicon-icon" rel="icon" type="image/png" href="">
+
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.6);
+        }
+        .glass-card {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.25s ease-out forwards;
+        }
+        @keyframes softPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.65; }
+        }
+        .animate-soft-pulse {
+            animation: softPulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 pb-28 md:pb-14">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-30 bg-white/85 dark:bg-slate-900/85 glass-card border-b border-slate-200/80 dark:border-slate-800">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-emerald-600 dark:from-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent truncate">
+                        Beli Barang Record
+                    </h1>
+                    <div class="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                        <span id="sync-dot" class="w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0"></span>
+                        <span id="sync-status-text" class="truncate">Mod Tetamu (Simpanan Lokal)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                <!-- Sync Local Data Button -->
+                <button id="btn-sync-local" onclick="window.syncGuestDataToCloud()" class="hidden items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 transition">
+                    <i data-lucide="cloud-upload" class="w-3.5 h-3.5"></i>
+                    <span class="hidden sm:inline">Sync Data Tetamu ke Cloud</span>
+                    <span id="local-count-badge" class="bg-amber-600 text-white px-1.5 py-0.2 rounded-full text-[10px]">0</span>
+                </button>
+
+                <!-- Enable Notification Button -->
+                <button id="btn-notif-perm" onclick="window.requestNotificationPermission()" title="Aktifkan Notifikasi Reminder" class="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 text-xs font-bold transition">
+                    <i id="icon-notif" data-lucide="bell-ring" class="w-4 h-4"></i>
+                    <span id="text-notif-status" class="hidden md:inline">Aktifkan Reminder</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="btn-theme-toggle" onclick="window.toggleTheme()" title="Tukar Tema Gelap/Terang" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                    <i id="icon-theme" data-lucide="moon" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Auth Section -->
+                <div id="auth-guest-view">
+                    <button onclick="window.loginWithGoogle()" class="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-semibold shadow-sm shadow-indigo-500/30 transition">
+                        <svg class="w-4 h-4 bg-white rounded-full p-0.5 shrink-0" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+                            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"/>
+                            <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"/>
+                            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96Z"/>
+                        </svg>
+                        <span>Log Masuk</span>
+                    </button>
+                </div>
+
+                <div id="auth-user-view" class="hidden items-center gap-2">
+                    <div class="hidden md:flex flex-col text-right">
+                        <span id="user-name" class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight">Pengguna</span>
+                        <span id="user-email" class="text-[10px] text-slate-500 dark:text-slate-400">user@gmail.com</span>
+                    </div>
+                    <img id="user-avatar" src="" alt="Profil" class="w-8 h-8 rounded-full border-2 border-emerald-500 object-cover">
+                    <button onclick="window.logoutUser()" title="Log Keluar" class="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Active Reminder Alert Banner (Appears when a reminder triggers) -->
+    <div id="reminder-alert-banner" class="hidden max-w-5xl mx-auto px-4 sm:px-6 pt-4">
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/20 flex items-center justify-between gap-3 animate-slide-up">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0 animate-bounce">
+                    <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-amber-100">Peringatan Beli Barang!</div>
+                    <div id="reminder-alert-text" class="text-sm sm:text-base font-extrabold leading-snug"></div>
+                </div>
+            </div>
+            <button onclick="window.dismissReminderBanner()" class="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-xs font-bold shrink-0 transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 pt-5 space-y-5">
+
+        <!-- Prominent Action Bar: Share WhatsApp Today & Add Item -->
+        <div class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                    <span id="header-today-date">Hari Ini</span>
+                </div>
+                <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+                    Senarai Barang Perlu Beli
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Tetapkan tarikh beli & masa reminder supaya tak lupa bila keluar ke kedai.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- Primary WhatsApp Share Button (Today's List) -->
+                <button onclick="window.shareWhatsAppList('today')" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs sm:text-sm font-extrabold bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white shadow-md shadow-emerald-600/20 transition">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                    <span>Share List Barang Hari Ini ke WhatsApp</span>
+                </button>
+
+                <!-- Secondary Share Dropdown / All Pending Button -->
+                <div class="flex items-center gap-1.5">
+                    <button onclick="window.shareWhatsAppList('all_pending')" title="Kongsi Semua Barang Belum Beli ke WhatsApp" class="px-3 py-3 rounded-2xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 transition">
+                        Semua Belum Beli
+                    </button>
+                    <button onclick="window.copyWhatsAppText('today')" title="Salin Teks Senarai Hari Ini" class="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Desktop Add Item Button -->
+                <button onclick="window.openItemModal()" class="hidden md:flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-extrabold bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white shadow-md shadow-indigo-600/20 transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>Tambah Barang</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Status Summary Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div onclick="window.setActiveTab('today')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-indigo-400 transition shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Hari Ini</span>
+                    <span class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400">
+                        <i data-lucide="sun" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="count-today" class="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1">0</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Target / Remind hari ini</div>
+            </div>
+
+            <div onclick="window.setActiveTab('overdue')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-rose-400 transition shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Lewat (Overdue)</span>
+                    <span class="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="count-overdue" class="text-2xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">0</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Belum dibeli & terlepas</div>
+            </div>
+
+            <div onclick="window.setActiveTab('upcoming')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-amber-400 transition shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Akan Datang</span>
+                    <span class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-600 dark:text-amber-400">
+                        <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="count-upcoming" class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-1">0</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Dijadualkan esok & lusa</div>
+            </div>
+
+            <div onclick="window.setActiveTab('bought')" class="cursor-pointer bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-emerald-400 transition shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Sudah Beli</span>
+                    <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    </span>
+                </div>
+                <div id="count-bought" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">0</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">Selesai dibeli</div>
+            </div>
+        </div>
+
+        <!-- Smart Filter Tabs & Search / Category Bar -->
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3.5">
+            <!-- Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1" id="smart-tabs">
+                <button data-tab="all" onclick="window.setActiveTab('all')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow-sm">
+                    Semua (<span id="tab-badge-all">0</span>)
+                </button>
+                <button data-tab="today" onclick="window.setActiveTab('today')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+                    Hari Ini (<span id="tab-badge-today">0</span>)
+                </button>
+                <button data-tab="overdue" onclick="window.setActiveTab('overdue')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+                    Lewat (Overdue) (<span id="tab-badge-overdue">0</span>)
+                </button>
+                <button data-tab="upcoming" onclick="window.setActiveTab('upcoming')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+                    Akan Datang (<span id="tab-badge-upcoming">0</span>)
+                </button>
+                <button data-tab="bought" onclick="window.setActiveTab('bought')" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">
+                    Sudah Beli (<span id="tab-badge-bought">0</span>)
+                </button>
+            </div>
+
+            <!-- Search & Category Filter -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div class="sm:col-span-7 relative">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="search-input" oninput="window.renderItems()" placeholder="Cari nama barang, kedai atau catatan..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="sm:col-span-5">
+                    <select id="filter-category" onchange="window.renderItems()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="Semua">Semua Kategori / Kedai</option>
+                        <option value="Barang Dapur">Barang Dapur</option>
+                        <option value="Keperluan Rumah">Keperluan Rumah</option>
+                        <option value="Hardware">Hardware</option>
+                        <option value="Kedai RM2">Kedai RM2</option>
+                        <option value="DIY">DIY</option>
+                        <option value="Lain-lain">Lain-lain</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Records List Section -->
+        <div class="space-y-3">
+            <div class="flex items-center justify-between px-1">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Paparan Senarai (<span id="list-showing-count">0</span>)
+                </h3>
+                <span class="text-[11px] text-slate-400">Klik kotak semak untuk tandakan Sudah Beli</span>
+            </div>
+
+            <!-- Cards Grid -->
+            <div id="items-list" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-300 dark:border-slate-700 p-10 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-500 flex items-center justify-center mx-auto mb-3">
+                    <i data-lucide="clipboard-list" class="w-7 h-7"></i>
+                </div>
+                <h3 class="text-base font-extrabold text-slate-800 dark:text-white">Tiada Barang Dalam Senarai Ini</h3>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 mb-4">
+                    Tambah barang yang perlu dibeli berserta tarikh dan masa reminder supaya anda tidak terlupa.
+                </p>
+                <button onclick="window.openItemModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Tambah Barang Sekarang</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Floating Action Button (FAB) -->
+    <button onclick="window.openItemModal()" aria-label="Tambah Barang" class="md:hidden fixed bottom-6 right-6 z-30 w-14 h-14 rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center active:scale-90 transition">
+        <i data-lucide="plus" class="w-7 h-7"></i>
+    </button>
+
+    <!-- MODAL 1: Add / Edit Item (No Price / No Budget) -->
+    <div id="item-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-slide-up my-auto">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/40">
+                <h3 id="item-modal-title" class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <i data-lucide="package-plus" class="w-5 h-5 text-indigo-600"></i>
+                    <span>Tambah Barang Perlu Beli</span>
+                </h3>
+                <button onclick="window.closeItemModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="item-form" onsubmit="window.handleSaveItem(event)" class="p-5 sm:p-6 space-y-4">
+                <input type="hidden" id="item-id">
+
+                <!-- Nama Barang -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nama Barang *</label>
+                    <input type="text" id="item-name" required placeholder="Contoh: Beras 10kg, Mentol LED, Sabun Basuh..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <!-- Kuantiti & Unit + Kategori / Kedai -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kuantiti & Unit</label>
+                        <input type="text" id="item-qty-unit" placeholder="Contoh: 2 pek, 1 botol, 3 kg" value="1" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Kategori / Kedai</label>
+                        <select id="item-category" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Barang Dapur">Barang Dapur</option>
+                            <option value="Keperluan Rumah">Keperluan Rumah</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Kedai RM2">Kedai RM2</option>
+                            <option value="DIY">DIY</option>
+                            <option value="Lain-lain">Lain-lain</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tarikh Perlu Beli / Target Beli -->
+                <div class="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-3">
+                    <div>
+                        <label class="block text-xs font-extrabold text-indigo-800 dark:text-indigo-300 mb-1 flex items-center gap-1.5">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                            <span>Tarikh Perlu Beli / Target Beli *</span>
+                        </label>
+                        <input type="date" id="item-tarikh-beli" required onchange="window.syncDefaultRemindDate()" class="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <!-- Tarikh & Masa Reminder -->
+                    <div class="pt-1 border-t border-indigo-100 dark:border-indigo-900/50">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="text-xs font-extrabold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                                <span>Remind Sebelum Bila & Kul Berapa</span>
+                            </label>
+                            <div class="flex gap-1">
+                                <button type="button" onclick="window.setQuickRemindPreset('same_day')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">Hari Sama</button>
+                                <button type="button" onclick="window.setQuickRemindPreset('day_before')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">1 Hari Sebelum</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Tarikh Reminder</label>
+                                <input type="date" id="item-tarikh-remind" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Masa Reminder (Kul Berapa)</label>
+                                <input type="time" id="item-masa-remind" value="17:00" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Catatan / Jenama Spesifik -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Catatan / Jenama Spesifik (Optional)</label>
+                    <textarea id="item-notes" rows="2" placeholder="Contoh: Jenama Cap Rambutan, saiz besar, kedai depan simpang..." class="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <!-- Status Toggle inside Modal -->
+                <div class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700">
+                    <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Status Pembelian</span>
+                    <select id="item-status" class="bg-transparent text-xs font-extrabold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer">
+                        <option value="belum">Belum Beli</option>
+                        <option value="sudah">Sudah Beli</option>
+                    </select>
+                </div>
+
+                <!-- Form Buttons -->
+                <div class="flex items-center justify-end gap-2.5 pt-2">
+                    <button type="button" onclick="window.closeItemModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 shadow-md shadow-indigo-500/20 transition">
+                        Simpan Barang
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Delete Confirmation -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 text-center animate-slide-up">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="trash-2" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-slate-900 dark:text-white">Padam Barang Ini?</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-5">
+                Rekod <span id="delete-item-name" class="font-bold text-slate-700 dark:text-slate-200"></span> akan dipadam secara kekal.
+            </p>
+            <div class="flex justify-center gap-2.5">
+                <button onclick="window.closeDeleteModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Batal</button>
+                <button onclick="window.confirmDeleteItem()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Ya, Padam</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-max max-w-[92vw]"></div>
+
+    <!-- Firebase JS SDK v11 Modular CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import {
+            getAuth,
+            GoogleAuthProvider,
+            signInWithPopup,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            doc,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            onSnapshot,
+            query,
+            serverTimestamp,
+            writeBatch
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxLHFHJBCH8z6rruytg04_hIQFZI2b3MA",
+            authDomain: "beli-barang-record.firebaseapp.com",
+            projectId: "beli-barang-record",
+            storageBucket: "beli-barang-record.firebasestorage.app",
+            messagingSenderId: "409645641374",
+            appId: "1:409645641374:web:8451a2cc35693a7738158f",
+            measurementId: "G-GZ3GW6X7NE"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+        // Kunci LocalStorage
+        const LS_ITEMS_KEY = 'beli_barang_items_v2_guest';
+        const LS_THEME_KEY = 'beli_barang_theme_v2';
+        const LS_NOTIFIED_KEY = 'beli_barang_notified_ids_v2';
+
+        // State Utama
+        let currentUser = null;
+        let items = [];
+        let activeTab = 'all';
+        let unsubscribeItems = null;
+        let itemToDeleteId = null;
+        let reminderIntervalId = null;
+
+        // ==========================================
+        // 1. PWA ICON & MANIFEST DINAMIK (iPad/iOS)
+        // ==========================================
+        function setupDynamicPWA() {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                // Latar belakang gradien
+                const grad = ctx.createLinearGradient(0, 0, 512, 512);
+                grad.addColorStop(0, '#4f46e5');
+                grad.addColorStop(1, '#10b981');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.roundRect(0, 0, 512, 512, 112);
+                ctx.fill();
+
+                // Ikon Beg Beli-Belah & Loceng Peringatan
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 34;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                ctx.strokeRect(136, 190, 240, 205);
+                ctx.beginPath();
+                ctx.arc(256, 190, 62, Math.PI, 0, false);
+                ctx.stroke();
+
+                // Tanda semak
+                ctx.beginPath();
+                ctx.moveTo(205, 292);
+                ctx.lineTo(242, 328);
+                ctx.lineTo(312, 256);
+                ctx.stroke();
+
+                const iconDataUrl = canvas.toDataURL('image/png');
+                document.getElementById('apple-touch-icon').href = iconDataUrl;
+                document.getElementById('favicon-icon').href = iconDataUrl;
+
+                const manifest = {
+                    name: "Beli Barang Record",
+                    short_name: "Beli Barang",
+                    description: "Rekod barang perlu beli, peringatan masa, dan perkongsian WhatsApp.",
+                    start_url: window.location.href,
+                    display: "standalone",
+                    background_color: "#0f172a",
+                    theme_color: "#4f46e5",
+                    icons: [
+                        {
+                            src: iconDataUrl,
+                            sizes: "512x512",
+                            type: "image/png",
+                            purpose: "any maskable"
+                        }
+                    ]
+                };
+
+                const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                document.getElementById('pwa-manifest').href = URL.createObjectURL(manifestBlob);
+            } catch (err) {
+                console.warn("PWA setup skipped:", err);
+            }
+        }
+
+        // ==========================================
+        // 2. PENGURUSAN TEMA (DARK / LIGHT MODE)
+        // ==========================================
+        function initTheme() {
+            const savedTheme = localStorage.getItem(LS_THEME_KEY);
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+            applyTheme(isDark);
+        }
+
+        function applyTheme(isDark) {
+            const html = document.documentElement;
+            const icon = document.getElementById('icon-theme');
+            if (isDark) {
+                html.classList.add('dark');
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                html.classList.remove('dark');
+                icon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+
+        window.toggleTheme = function () {
+            const isCurrentlyDark = document.documentElement.classList.contains('dark');
+            const nextDark = !isCurrentlyDark;
+            localStorage.setItem(LS_THEME_KEY, nextDark ? 'dark' : 'light');
+            applyTheme(nextDark);
+        };
+
+        // ==========================================
+        // 3. UTILITI TARIKH, MASA & TOAST
+        // ==========================================
+        function getLocalDateStr(offsetDays = 0) {
+            const d = new Date();
+            d.setDate(d.getDate() + offsetDays);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(dateStr) {
+            if (!dateStr) return '-';
+            const todayStr = getLocalDateStr(0);
+            const tomorrowStr = getLocalDateStr(1);
+            const yesterdayStr = getLocalDateStr(-1);
+
+            if (dateStr === todayStr) return 'Hari Ini';
+            if (dateStr === tomorrowStr) return 'Esok';
+            if (dateStr === yesterdayStr) return 'Semalam';
+
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
+            const mIdx = parseInt(parts[1], 10) - 1;
+            return `${parseInt(parts[2], 10)} ${months[mIdx] || parts[1]} ${parts[0]}`;
+        }
+
+        function formatShortDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const months = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
+            const mIdx = parseInt(parts[1], 10) - 1;
+            return `${parseInt(parts[2], 10)} ${months[mIdx] || parts[1]}`;
+        }
+
+        function formatTime12Hour(time24) {
+            if (!time24) return '';
+            const [hStr, mStr] = time24.split(':');
+            let h = parseInt(hStr, 10);
+            if (isNaN(h)) return time24;
+            let period = 'PG';
+            if (h >= 12 && h < 19) period = 'PTG';
+            else if (h >= 19) period = 'MLM';
+            else if (h === 12) period = 'TGH';
+
+            const h12 = h % 12 === 0 ? 12 : h % 12;
+            return `${h12}:${mStr} ${period}`;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'error'
+                ? 'bg-rose-600 text-white'
+                : type === 'warning'
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900';
+
+            toast.className = `${bgClass} px-4 py-2.5 rounded-2xl shadow-xl text-xs sm:text-sm font-semibold flex items-center gap-2 animate-slide-up`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3400);
+        }
+
+        // ==========================================
+        // 4. SISTEM REMINDER PINTAR & NOTIFIKASI PELAYAR
+        // ==========================================
+        function playGentleChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const now = ctx.currentTime;
+
+                const notes = [587.33, 880.00]; // D5 -> A5 chime
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, now + idx * 0.16);
+
+                    gain.gain.setValueAtTime(0.001, now + idx * 0.16);
+                    gain.gain.exponentialRampToValueAtTime(0.18, now + idx * 0.16 + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.16 + 0.55);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now + idx * 0.16);
+                    osc.stop(now + idx * 0.16 + 0.6);
+                });
+            } catch (e) {
+                console.warn("Web Audio chime blocked:", e);
+            }
+        }
+
+        function updateNotificationButtonUI() {
+            const btn = document.getElementById('btn-notif-perm');
+            const txt = document.getElementById('text-notif-status');
+            if (!('Notification' in window)) {
+                btn.classList.add('hidden');
+                return;
+            }
+            if (Notification.permission === 'granted') {
+                btn.className = "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition";
+                txt.textContent = "Reminder Aktif";
+            } else if (Notification.permission === 'denied') {
+                btn.className = "flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-xs font-bold transition";
+                txt.textContent = "Notifikasi Disekat";
+            } else {
+                txt.textContent = "Aktifkan Reminder";
+            }
+        }
+
+        window.requestNotificationPermission = async function () {
+            if (!('Notification' in window)) {
+                showToast("Pelayar ini tidak menyokong notifikasi sistem, tetapi amaran dalam aplikasi tetap aktif!", "warning");
+                playGentleChime();
+                return;
+            }
+            try {
+                const perm = await Notification.requestPermission();
+                updateNotificationButtonUI();
+                if (perm === 'granted') {
+                    playGentleChime();
+                    showToast("Notifikasi reminder diaktifkan!");
+                    new Notification("Beli Barang Record", {
+                        body: "Peringatan beli barang kini aktif untuk peranti anda."
+                    });
+                } else {
+                    showToast("Sila benarkan notifikasi di tetapan pelayar jika mahu amaran pop-up.", "warning");
+                }
+            } catch (err) {
+                console.error("Notification permission error:", err);
+            }
+        };
+
+        function getNotifiedMap() {
+            try {
+                return JSON.parse(localStorage.getItem(LS_NOTIFIED_KEY)) || {};
+            } catch {
+                return {};
+            }
+        }
+
+        function markAsNotified(key) {
+            const map = getNotifiedMap();
+            map[key] = Date.now();
+            localStorage.setItem(LS_NOTIFIED_KEY, JSON.stringify(map));
+        }
+
+        function checkRemindersNow() {
+            const now = new Date();
+            const notifiedMap = getNotifiedMap();
+            const triggeredItems = [];
+
+            items.forEach(item => {
+                if (item.status === 'sudah') return;
+                if (!item.tarikhRemind || !item.masaRemind) return;
+
+                const remindDateTime = new Date(`${item.tarikhRemind}T${item.masaRemind}:00`);
+                if (isNaN(remindDateTime.getTime())) return;
+
+                // Hanya trigger jika waktu reminder telah tiba (dalam lingkungan 24 jam lepas supaya tidak spam rekod terlalu lama)
+                const diffMs = now.getTime() - remindDateTime.getTime();
+                const uniqueTriggerKey = `${item.id}_${item.tarikhRemind}_${item.masaRemind}`;
+
+                if (diffMs >= 0 && diffMs <= 24 * 60 * 60 * 1000 && !notifiedMap[uniqueTriggerKey]) {
+                    markAsNotified(uniqueTriggerKey);
+                    triggeredItems.push(item);
+                }
+            });
+
+            if (triggeredItems.length > 0) {
+                playGentleChime();
+
+                const namesList = triggeredItems.map(i => `${i.name} (${i.qtyUnit || '1'})`).join(', ');
+                const banner = document.getElementById('reminder-alert-banner');
+                const bannerText = document.getElementById('reminder-alert-text');
+
+                bannerText.textContent = `Masa untuk beli: ${namesList}`;
+                banner.classList.remove('hidden');
+
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    triggeredItems.forEach(item => {
+                        new Notification(`🛒 Reminder Beli: ${item.name}`, {
+                            body: `Kuantiti: ${item.qtyUnit || '1'} • Kategori: ${item.category || 'Umum'}\nTarget Beli: ${formatDisplayDate(item.tarikhBeli)}`
+                        });
+                    });
+                }
+            }
+        }
+
+        window.dismissReminderBanner = function () {
+            document.getElementById('reminder-alert-banner').classList.add('hidden');
+        };
+
+        // ==========================================
+        // 5. LOG MASUK GOOGLE (signInWithPopup SAHAJA)
+        // ==========================================
+        window.loginWithGoogle = async function () {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                showToast("Berjaya log masuk dengan Google!");
+            } catch (error) {
+                console.error("Google Sign-In Error:", error);
+                if (error.code === 'auth/popup-blocked') {
+                    showToast("Popup disekat oleh Safari/Pelayar. Sila benarkan popup.", "error");
+                } else if (error.code !== 'auth/popup-closed-by-user') {
+                    showToast("Gagal log masuk: " + error.message, "error");
+                }
+            }
+        };
+
+        window.logoutUser = async function () {
+            try {
+                await signOut(auth);
+                showToast("Log keluar berjaya. Beralih ke Mod Tetamu.");
+            } catch (error) {
+                showToast("Ralat log keluar: " + error.message, "error");
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            const guestView = document.getElementById('auth-guest-view');
+            const userView = document.getElementById('auth-user-view');
+            const syncDot = document.getElementById('sync-dot');
+            const syncText = document.getElementById('sync-status-text');
+
+            if (unsubscribeItems) {
+                unsubscribeItems();
+                unsubscribeItems = null;
+            }
+
+            if (user) {
+                guestView.classList.add('hidden');
+                userView.classList.remove('hidden');
+                userView.classList.add('flex');
+
+                document.getElementById('user-name').textContent = user.displayName || 'Pengguna Google';
+                document.getElementById('user-email').textContent = user.email || '';
+                document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=4f46e5&color=fff`;
+
+                syncDot.className = 'w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse shrink-0';
+                syncText.textContent = 'Cloud Sync Aktif';
+
+                checkGuestDataBadge();
+                subscribeCloudItems(user.uid);
+            } else {
+                guestView.classList.remove('hidden');
+                userView.classList.add('hidden');
+                userView.classList.remove('flex');
+                document.getElementById('btn-sync-local').classList.add('hidden');
+
+                syncDot.className = 'w-2 h-2 rounded-full bg-amber-500 inline-block shrink-0';
+                syncText.textContent = 'Mod Tetamu (Simpanan Lokal)';
+
+                loadGuestItems();
+            }
+        });
+
+        // ==========================================
+        // 6. SIMPANAN DATA: FIRESTORE & LOCALSTORAGE
+        // ==========================================
+        function getGuestItemsFromStorage() {
+            try {
+                return JSON.parse(localStorage.getItem(LS_ITEMS_KEY)) || [];
+            } catch {
+                return [];
+            }
+        }
+
+        function saveGuestItemsToStorage(list) {
+            localStorage.setItem(LS_ITEMS_KEY, JSON.stringify(list));
+        }
+
+        function loadGuestItems() {
+            items = getGuestItemsFromStorage();
+            refreshUI();
+            checkRemindersNow();
+        }
+
+        function subscribeCloudItems(uid) {
+            const colRef = collection(db, 'users', uid, 'beli_barang_items');
+            const q = query(colRef);
+
+            unsubscribeItems = onSnapshot(q, (snapshot) => {
+                items = snapshot.docs.map(docSnap => ({
+                    id: docSnap.id,
+                    ...docSnap.data()
+                }));
+                refreshUI();
+                checkRemindersNow();
+            }, (error) => {
+                console.error("Firestore onSnapshot error:", error);
+                showToast("Ralat menyegerak data awan.", "error");
+            });
+        }
+
+        function checkGuestDataBadge() {
+            const guestData = getGuestItemsFromStorage();
+            const btnSync = document.getElementById('btn-sync-local');
+            const badge = document.getElementById('local-count-badge');
+
+            if (currentUser && guestData.length > 0) {
+                badge.textContent = guestData.length;
+                btnSync.classList.remove('hidden');
+                btnSync.classList.add('flex');
+            } else {
+                btnSync.classList.add('hidden');
+                btnSync.classList.remove('flex');
+            }
+        }
+
+        window.syncGuestDataToCloud = async function () {
+            if (!currentUser) return;
+            const guestData = getGuestItemsFromStorage();
+            if (guestData.length === 0) {
+                showToast("Tiada data tetamu untuk dipindahkan.");
+                return;
+            }
+
+            try {
+                const batch = writeBatch(db);
+                const colRef = collection(db, 'users', currentUser.uid, 'beli_barang_items');
+
+                guestData.forEach(item => {
+                    const newDocRef = doc(colRef);
+                    const { id, ...cleanData } = item;
+                    batch.set(newDocRef, {
+                        ...cleanData,
+                        syncedFromGuest: true,
+                        updatedAt: serverTimestamp()
+                    });
+                });
+
+                await batch.commit();
+                localStorage.removeItem(LS_ITEMS_KEY);
+                checkGuestDataBadge();
+                showToast(`${guestData.length} rekod berjaya dipindahkan ke Cloud!`);
+            } catch (error) {
+                console.error("Sync error:", error);
+                showToast("Gagal memindahkan data ke Cloud.", "error");
+            }
+        };
+
+        // ==========================================
+        // 7. CRUD REKOD BARANG & REMINDER
+        // ==========================================
+        window.syncDefaultRemindDate = function () {
+            const tarikhBeli = document.getElementById('item-tarikh-beli').value;
+            const tarikhRemindEl = document.getElementById('item-tarikh-remind');
+            if (tarikhBeli && !tarikhRemindEl.value) {
+                tarikhRemindEl.value = tarikhBeli;
+            }
+        };
+
+        window.setQuickRemindPreset = function (preset) {
+            const tarikhBeli = document.getElementById('item-tarikh-beli').value || getLocalDateStr(0);
+            const parts = tarikhBeli.split('-').map(Number);
+            const d = new Date(parts[0], parts[1] - 1, parts[2]);
+
+            if (preset === 'day_before') {
+                d.setDate(d.getDate() - 1);
+            }
+
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            document.getElementById('item-tarikh-remind').value = `${y}-${m}-${day}`;
+        };
+
+        window.openItemModal = function (editId = null) {
+            const modal = document.getElementById('item-modal');
+            const title = document.getElementById('item-modal-title');
+            const form = document.getElementById('item-form');
+            form.reset();
+
+            if (editId) {
+                const target = items.find(i => i.id === editId);
+                if (!target) return;
+
+                title.innerHTML = `<i data-lucide="edit-3" class="w-5 h-5 text-indigo-600"></i><span>Kemaskini Barang</span>`;
+                document.getElementById('item-id').value = target.id;
+                document.getElementById('item-name').value = target.name || '';
+                document.getElementById('item-qty-unit').value = target.qtyUnit || '1';
+                document.getElementById('item-category').value = target.category || 'Barang Dapur';
+                document.getElementById('item-tarikh-beli').value = target.tarikhBeli || getLocalDateStr(0);
+                document.getElementById('item-tarikh-remind').value = target.tarikhRemind || '';
+                document.getElementById('item-masa-remind').value = target.masaRemind || '17:00';
+                document.getElementById('item-notes').value = target.notes || '';
+                document.getElementById('item-status').value = target.status || 'belum';
+            } else {
+                const today = getLocalDateStr(0);
+                title.innerHTML = `<i data-lucide="package-plus" class="w-5 h-5 text-indigo-600"></i><span>Tambah Barang Perlu Beli</span>`;
+                document.getElementById('item-id').value = '';
+                document.getElementById('item-qty-unit').value = '1';
+                document.getElementById('item-tarikh-beli').value = today;
+                document.getElementById('item-tarikh-remind').value = today;
+                document.getElementById('item-masa-remind').value = '17:00';
+                document.getElementById('item-status').value = 'belum';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.closeItemModal = function () {
+            const modal = document.getElementById('item-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.handleSaveItem = async function (event) {
+            event.preventDefault();
+
+            const id = document.getElementById('item-id').value;
+            const name = document.getElementById('item-name').value.trim();
+            const qtyUnit = document.getElementById('item-qty-unit').value.trim() || '1';
+            const category = document.getElementById('item-category').value;
+            const tarikhBeli = document.getElementById('item-tarikh-beli').value;
+            const tarikhRemind = document.getElementById('item-tarikh-remind').value;
+            const masaRemind = document.getElementById('item-masa-remind').value;
+            const notes = document.getElementById('item-notes').value.trim();
+            const status = document.getElementById('item-status').value;
+
+            if (!name || !tarikhBeli) {
+                showToast("Sila isi Nama Barang dan Tarikh Perlu Beli.", "warning");
+                return;
+            }
+
+            const itemData = {
+                name,
+                qtyUnit,
+                category,
+                tarikhBeli,
+                tarikhRemind: tarikhRemind || '',
+                masaRemind: tarikhRemind ? (masaRemind || '17:00') : '',
+                notes,
+                status
+            };
+
+            try {
+                if (currentUser) {
+                    const colRef = collection(db, 'users', currentUser.uid, 'beli_barang_items');
+                    if (id) {
+                        await updateDoc(doc(colRef, id), {
+                            ...itemData,
+                            updatedAt: serverTimestamp()
+                        });
+                        showToast("Rekod barang dikemaskini!");
+                    } else {
+                        await addDoc(colRef, {
+                            ...itemData,
+                            createdAt: serverTimestamp(),
+                            updatedAt: serverTimestamp()
+                        });
+                        showToast("Barang ditambah ke senarai!");
+                    }
+                } else {
+                    if (id) {
+                        items = items.map(i => i.id === id ? { ...i, ...itemData } : i);
+                        showToast("Rekod lokal dikemaskini!");
+                    } else {
+                        const newLocal = {
+                            id: 'local_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                            ...itemData,
+                            createdAt: new Date().toISOString()
+                        };
+                        items.unshift(newLocal);
+                        showToast("Disimpan secara lokal (Mod Tetamu)!");
+                    }
+                    saveGuestItemsToStorage(items);
+                    refreshUI();
+                }
+
+                window.closeItemModal();
+                checkRemindersNow();
+            } catch (error) {
+                console.error("Save error:", error);
+                showToast("Gagal menyimpan: " + error.message, "error");
+            }
+        };
+
+        window.toggleItemStatus = async function (id) {
+            const target = items.find(i => i.id === id);
+            if (!target) return;
+
+            const nextStatus = target.status === 'sudah' ? 'belum' : 'sudah';
+
+            try {
+                if (currentUser) {
+                    const docRef = doc(db, 'users', currentUser.uid, 'beli_barang_items', id);
+                    await updateDoc(docRef, {
+                        status: nextStatus,
+                        updatedAt: serverTimestamp()
+                    });
+                } else {
+                    items = items.map(i => i.id === id ? { ...i, status: nextStatus } : i);
+                    saveGuestItemsToStorage(items);
+                    refreshUI();
+                }
+                showToast(nextStatus === 'sudah' ? `Selesai dibeli: ${target.name}` : `Ditanda belum beli: ${target.name}`);
+            } catch (error) {
+                console.error("Toggle status error:", error);
+                showToast("Gagal mengemaskini status.", "error");
+            }
+        };
+
+        window.openDeleteModal = function (id) {
+            const target = items.find(i => i.id === id);
+            if (!target) return;
+            itemToDeleteId = id;
+            document.getElementById('delete-item-name').textContent = `"${target.name}"`;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        window.closeDeleteModal = function () {
+            itemToDeleteId = null;
+            const modal = document.getElementById('delete-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        window.confirmDeleteItem = async function () {
+            if (!itemToDeleteId) return;
+            try {
+                if (currentUser) {
+                    await deleteDoc(doc(db, 'users', currentUser.uid, 'beli_barang_items', itemToDeleteId));
+                } else {
+                    items = items.filter(i => i.id !== itemToDeleteId);
+                    saveGuestItemsToStorage(items);
+                    refreshUI();
+                }
+                showToast("Barang dipadam.");
+                window.closeDeleteModal();
+            } catch (error) {
+                console.error("Delete error:", error);
+                showToast("Gagal memadam barang.", "error");
+            }
+        };
+
+        // ==========================================
+        // 8. PENAPIS PINTAR & PAPARAN SENARAI KAD
+        // ==========================================
+        function classifyItem(item) {
+            const todayStr = getLocalDateStr(0);
+            if (item.status === 'sudah') return 'bought';
+            if (item.tarikhBeli && item.tarikhBeli < todayStr) return 'overdue';
+            if (item.tarikhBeli === todayStr || item.tarikhRemind === todayStr) return 'today';
+            return 'upcoming';
+        }
+
+        window.setActiveTab = function (tabName) {
+            activeTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.className = "tab-btn px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition bg-indigo-600 text-white shadow-sm";
+                } else {
+                    btn.className = "tab-btn px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700";
+                }
+            });
+            window.renderItems();
+        };
+
+        function refreshUI() {
+            const todayCount = items.filter(i => classifyItem(i) === 'today').length;
+            const overdueCount = items.filter(i => classifyItem(i) === 'overdue').length;
+            const upcomingCount = items.filter(i => classifyItem(i) === 'upcoming').length;
+            const boughtCount = items.filter(i => classifyItem(i) === 'bought').length;
+
+            // Update Summary Cards
+            document.getElementById('count-today').textContent = todayCount;
+            document.getElementById('count-overdue').textContent = overdueCount;
+            document.getElementById('count-upcoming').textContent = upcomingCount;
+            document.getElementById('count-bought').textContent = boughtCount;
+
+            // Update Tab Badges
+            document.getElementById('tab-badge-all').textContent = items.length;
+            document.getElementById('tab-badge-today').textContent = todayCount;
+            document.getElementById('tab-badge-overdue').textContent = overdueCount;
+            document.getElementById('tab-badge-upcoming').textContent = upcomingCount;
+            document.getElementById('tab-badge-bought').textContent = boughtCount;
+
+            window.renderItems();
+        }
+
+        window.renderItems = function () {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('filter-category').value;
+            const todayStr = getLocalDateStr(0);
+            const tomorrowStr = getLocalDateStr(1);
+
+            const filtered = items.filter(item => {
+                const group = classifyItem(item);
+                const matchTab = activeTab === 'all' || group === activeTab;
+                const matchCategory = categoryFilter === 'Semua' || item.category === categoryFilter;
+                const matchSearch = !searchQuery ||
+                    (item.name || '').toLowerCase().includes(searchQuery) ||
+                    (item.category || '').toLowerCase().includes(searchQuery) ||
+                    (item.notes || '').toLowerCase().includes(searchQuery);
+
+                return matchTab && matchCategory && matchSearch;
+            });
+
+            // Susun keutamaan: Overdue -> Today -> Upcoming -> Bought
+            const priorityOrder = { overdue: 1, today: 2, upcoming: 3, bought: 4 };
+            filtered.sort((a, b) => {
+                const pA = priorityOrder[classifyItem(a)] || 5;
+                const pB = priorityOrder[classifyItem(b)] || 5;
+                if (pA !== pB) return pA - pB;
+                return (a.tarikhBeli || '').localeCompare(b.tarikhBeli || '');
+            });
+
+            const listContainer = document.getElementById('items-list');
+            const emptyState = document.getElementById('empty-state');
+            document.getElementById('list-showing-count').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            listContainer.innerHTML = filtered.map(item => {
+                const isBought = item.status === 'sudah';
+                const group = classifyItem(item);
+
+                // Visual Badge untuk Tarikh Beli
+                let dateBadgeHTML = '';
+                if (isBought) {
+                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-400">SUDAH BELI</span>`;
+                } else if (group === 'overdue') {
+                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-700 dark:bg-rose-950/90 dark:text-rose-400 animate-soft-pulse">LEWAT TARIKH / OVERDUE (${formatShortDate(item.tarikhBeli)})</span>`;
+                } else if (item.tarikhBeli === todayStr) {
+                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-100 text-indigo-700 dark:bg-indigo-950/90 dark:text-indigo-300">HARI INI</span>`;
+                } else if (item.tarikhBeli === tomorrowStr) {
+                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950/90 dark:text-amber-300">ESOK</span>`;
+                } else {
+                    dateBadgeHTML = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">${formatDisplayDate(item.tarikhBeli)}</span>`;
+                }
+
+                // Paparan Waktu Reminder
+                const hasReminder = item.tarikhRemind && item.masaRemind;
+                const reminderText = hasReminder
+                    ? `Remind: ${formatShortDate(item.tarikhRemind)}, ${formatTime12Hour(item.masaRemind)}`
+                    : 'Tiada reminder ditetapkan';
+
+                const cardBorderClass = isBought
+                    ? 'border-slate-200/70 dark:border-slate-800/80 opacity-80'
+                    : group === 'overdue'
+                        ? 'border-rose-300 dark:border-rose-800/80'
+                        : group === 'today'
+                            ? 'border-indigo-300 dark:border-indigo-800/80'
+                            : 'border-slate-200/90 dark:border-slate-800';
+
+                return `
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border ${cardBorderClass} shadow-sm hover:shadow-md transition flex flex-col justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <!-- Checkbox Tandakan Sudah Beli -->
+                            <button onclick="window.toggleItemStatus('${item.id}')" title="${isBought ? 'Tandakan Belum Beli' : 'Tandakan Sudah Beli'}" class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition ${isBought ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 hover:border-indigo-500'}">
+                                ${isBought ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
+                            </button>
+
+                            <!-- Kandungan Utama Kad -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white leading-snug ${isBought ? 'line-through text-slate-400 dark:text-slate-500' : ''}">
+                                        ${escapeHTML(item.name)}
+                                    </h4>
+                                    <span class="px-2.5 py-0.5 rounded-lg text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 shrink-0">
+                                        ${escapeHTML(item.qtyUnit || '1')}
+                                    </span>
+                                </div>
+
+                                <!-- Lencana Tarikh & Kategori -->
+                                <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                                    ${dateBadgeHTML}
+                                    <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                        ${escapeHTML(item.category || 'Lain-lain')}
+                                    </span>
+                                </div>
+
+                                <!-- Catatan jika ada -->
+                                ${item.notes ? `
+                                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400 italic line-clamp-2">
+                                        "${escapeHTML(item.notes)}"
+                                    </p>
+                                ` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Footer Kad: Masa Reminder & Butang Edit/Padam -->
+                        <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-1.5 ${hasReminder && !isBought ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-400'}">
+                                <i data-lucide="bell" class="w-3.5 h-3.5 shrink-0"></i>
+                                <span class="truncate">${reminderText}</span>
+                            </div>
+
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="window.openItemModal('${item.id}')" class="p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition" title="Edit">
+                                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button onclick="window.openDeleteModal('${item.id}')" class="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 transition" title="Padam">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        };
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ==========================================
+        // 9. JANA MESEJ & KONGSI KE WHATSAPP
+        // ==========================================
+        function buildWhatsAppMessage(mode = 'today') {
+            const todayStr = getLocalDateStr(0);
+            let targetList = [];
+            let titleText = '';
+
+            if (mode === 'today') {
+                // Barang belum dibeli yang tarikh belinya hari ini ATAU remindernya hari ini ATAU sudah lewat (overdue)
+                targetList = items.filter(i => i.status !== 'sudah' && (i.tarikhBeli <= todayStr || i.tarikhRemind === todayStr));
+                titleText = `*🛒 SENARAI BARANG PERLU BELI HARI INI (${formatShortDate(todayStr)})*`;
+            } else {
+                targetList = items.filter(i => i.status !== 'sudah');
+                titleText = `*🛒 SEMUA SENARAI BARANG BELUM BELI*`;
+            }
+
+            if (targetList.length === 0) return null;
+
+            let msg = `${titleText}\n`;
+            msg += `----------------------------------\n`;
+
+            targetList.forEach((item, idx) => {
+                const qtyLabel = item.qtyUnit ? ` (${item.qtyUnit})` : '';
+                const catLabel = item.category ? ` [${item.category}]` : '';
+                const remindLabel = (item.tarikhRemind && item.masaRemind)
+                    ? ` ⏰ Remind: ${formatShortDate(item.tarikhRemind)}, ${formatTime12Hour(item.masaRemind)}`
+                    : '';
+                const noteLabel = item.notes ? `\n   _Catatan: ${item.notes}_` : '';
+
+                msg += `${idx + 1}. *${item.name}*${qtyLabel}${catLabel}\n`;
+                msg += `   📅 Target: ${formatDisplayDate(item.tarikhBeli)}${remindLabel}${noteLabel}\n`;
+            });
+
+            msg += `----------------------------------\n`;
+            msg += `Jumlah: *${targetList.length} barang*`;
+            return msg;
+        }
+
+        window.shareWhatsAppList = function (mode = 'today') {
+            const message = buildWhatsAppMessage(mode);
+            if (!message) {
+                showToast(
+                    mode === 'today'
+                        ? "Tiada barang perlu dibeli untuk hari ini!"
+                        : "Tiada barang dalam senarai belum beli!",
+                    "warning"
+                );
+                return;
+            }
+            const waUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+        };
+
+        window.copyWhatsAppText = function (mode = 'today') {
+            const message = buildWhatsAppMessage(mode);
+            if (!message) {
+                showToast("Tiada senarai hari ini untuk disalin.", "warning");
+                return;
+            }
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = message;
+            tempTextarea.style.position = 'fixed';
+            tempTextarea.style.left = '-9999px';
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Teks senarai hari ini berjaya disalin!");
+            } catch (err) {
+                showToast("Gagal menyalin teks.", "error");
+            }
+            document.body.removeChild(tempTextarea);
+        };
+
+        // ==========================================
+        // 10. PERMULAAN APLIKASI (ON LOAD)
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const todayFormatted = formatDisplayDate(getLocalDateStr(0)) + ' (' + formatShortDate(getLocalDateStr(0)) + ')';
+            document.getElementById('header-today-date').textContent = todayFormatted;
+
+            initTheme();
+            setupDynamicPWA();
+            updateNotificationButtonUI();
+            lucide.createIcons();
+
+            // Muat data lokal dahulu sebelum pengesahan Firebase selesai
+            loadGuestItems();
+
+            // Mulakan semakan reminder setiap 30 saat
+            if (reminderIntervalId) clearInterval(reminderIntervalId);
+            reminderIntervalId = setInterval(checkRemindersNow, 30000);
+        });
+    </script>
+</body>
+</html>
