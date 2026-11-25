@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Beli Barang">
     <meta name="theme-color" content="#059669">
-    <title>Beli Barang Record — Senarai Beli Barang Ringkas</title>
+    <title>Beli Barang Record — Senarai Beli Barang & Kongsi Gambar</title>
 
     <!-- Dynamic PWA Manifest & Apple Touch Icon (Populated via JS Canvas) -->
     <link id="pwa-manifest" rel="manifest" href="">
@@ -124,116 +124,155 @@
     <!-- Main Container -->
     <main class="max-w-3xl mx-auto px-4 pt-5 space-y-5">
 
-        <!-- 1. BORANG TAMBAH BARANG PANTAS -->
+        <!-- 1. BORANG TAMBAH BARANG PANTAS + GAMBAR CONTOH -->
         <section class="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-sm">
-            <form id="quick-add-form" onsubmit="window.handleQuickAdd(event)" class="space-y-3">
+            <form id="quick-add-form" onsubmit="window.handleQuickAdd(event)" class="space-y-3.5">
                 <div class="flex items-center justify-between">
                     <label for="input-item-name" class="text-xs font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                         <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         <span>Tambah Barang Nak Beli</span>
                     </label>
-                    <span class="text-[11px] text-slate-400">Tekan Enter untuk terus tambah</span>
+                    <span class="text-[11px] text-slate-400 hidden sm:inline">Boleh taip atau tampal (Ctrl+V) gambar contoh</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
                     <!-- Nama Barang -->
                     <div class="sm:col-span-6">
-                        <input type="text" id="input-item-name" required autocomplete="off" placeholder="Nama barang (cth: Roti, Ubat Gigi, Kopi)..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <input type="text" id="input-item-name" required autocomplete="off" placeholder="Nama barang (cth: Kicap Kipas Udang, Roti)..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     </div>
 
                     <!-- Kuantiti -->
                     <div class="sm:col-span-3">
-                        <input type="text" id="input-item-qty" autocomplete="off" placeholder="Kuantiti (cth: 1 pek)" value="1" class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <input type="text" id="input-item-qty" autocomplete="off" placeholder="Kuantiti (cth: 1 botol)" value="1" class="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm sm:text-base font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     </div>
 
                     <!-- Butang Tambah Besar -->
                     <div class="sm:col-span-3">
-                        <button type="submit" class="w-full h-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-sm sm:text-base shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition">
+                        <button type="submit" id="btn-submit-add" class="w-full h-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-extrabold text-sm sm:text-base shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 transition">
                             <i data-lucide="plus" class="w-5 h-5"></i>
                             <span>Tambah</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Preset Kuantiti Pantas -->
-                <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-                    <span class="text-[11px] font-semibold text-slate-400 shrink-0 mr-1">Kuantiti pantas:</span>
-                    <button type="button" onclick="window.setQuickQty('1')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1</button>
-                    <button type="button" onclick="window.setQuickQty('2')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">2</button>
-                    <button type="button" onclick="window.setQuickQty('1 pek')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 pek</button>
-                    <button type="button" onclick="window.setQuickQty('1 botol')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 botol</button>
-                    <button type="button" onclick="window.setQuickQty('1 kg')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 kg</button>
-                    <button type="button" onclick="window.setQuickQty('1 kotak')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 kotak</button>
+                <!-- Bar Kuantiti Pantas + Lampiran Gambar Contoh -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                    <!-- Preset Kuantiti Pantas -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                        <span class="text-[11px] font-semibold text-slate-400 shrink-0 mr-0.5">Kuantiti:</span>
+                        <button type="button" onclick="window.setQuickQty('1')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1</button>
+                        <button type="button" onclick="window.setQuickQty('2')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">2</button>
+                        <button type="button" onclick="window.setQuickQty('1 pek')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 pek</button>
+                        <button type="button" onclick="window.setQuickQty('1 botol')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 botol</button>
+                        <button type="button" onclick="window.setQuickQty('1 kg')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 kg</button>
+                        <button type="button" onclick="window.setQuickQty('1 kotak')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-emerald-100 dark:bg-slate-800 dark:hover:bg-emerald-950 text-slate-600 dark:text-slate-300 hover:text-emerald-700 transition shrink-0">1 kotak</button>
+                    </div>
+
+                    <!-- Butang Lampir Gambar Contoh (Galeri / Kamera / Paste) -->
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <input type="file" id="input-item-image" accept="image/*" class="hidden" onchange="window.handleImageInputChange(event, 'add')">
+                        <input type="file" id="input-item-camera" accept="image/*" capture="environment" class="hidden" onchange="window.handleImageInputChange(event, 'add')">
+
+                        <button type="button" onclick="document.getElementById('input-item-image').click()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 transition">
+                            <i data-lucide="image-plus" class="w-3.5 h-3.5"></i>
+                            <span>Gambar Contoh</span>
+                        </button>
+
+                        <button type="button" onclick="document.getElementById('input-item-camera').click()" title="Ambil Gambar Kamera" class="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pratonton Gambar Contoh Sebelum Tambah -->
+                <div id="add-image-preview-box" class="hidden items-center justify-between p-2.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/80 dark:border-indigo-900/60 animate-pop-in">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img id="add-image-preview-img" src="" alt="Pratonton Gambar" class="w-12 h-12 rounded-xl object-cover border border-indigo-300 dark:border-indigo-700 shrink-0 bg-white">
+                        <div class="min-w-0">
+                            <p class="text-xs font-extrabold text-indigo-900 dark:text-indigo-200 truncate">Gambar Contoh Dilampirkan</p>
+                            <p id="add-image-size-label" class="text-[11px] text-indigo-600 dark:text-indigo-400">Sedia untuk disimpan & dikongsi</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="window.clearAddImage()" class="p-2 rounded-xl text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-950/60 transition" title="Buang Gambar">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </form>
         </section>
 
-        <!-- 2. PERKONGSIAN PANTAS WHATSAPP & TELEGRAM (NEUTRAL & SANTAI) -->
+        <!-- 2. PERKONGSIAN PESANAN UNIVERSAL + GAMBAR CONTOH -->
         <section class="bg-gradient-to-br from-emerald-50 to-teal-50/70 dark:from-slate-900 dark:to-slate-900 p-4 sm:p-5 rounded-3xl border border-emerald-200/80 dark:border-slate-800 shadow-sm space-y-3.5">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                     <h2 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                         <i data-lucide="send" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-                        <span>Kongsi / Kirim Senarai Barang</span>
+                        <span>Kongsi Pesanan & Gambar Contoh</span>
                     </h2>
                     <p id="share-helper-text" class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                        Hantar <strong class="text-emerald-700 dark:text-emerald-400">semua barang belum beli</strong> ke WhatsApp / Telegram, atau pilih item tertentu sahaja.
+                        Hantar <strong class="text-emerald-700 dark:text-emerald-400">semua barang belum beli</strong> beserta gambar contoh (jika ada) dengan ayat sopan universal.
                     </p>
                 </div>
 
-                <!-- Pilihan Gaya Mesej Neutral & Santai -->
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">Gaya Mesej:</span>
-                    <select id="share-style" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="tolong">Tolong belikan jap 🙏</option>
-                        <option value="senarai">Senarai barang nak beli 🛒</option>
-                        <option value="ringkas">Terus senarai (Ringkas)</option>
-                    </select>
+                <!-- Pratonton Ringkas Ayat -->
+                <div class="shrink-0">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-white/80 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-slate-700">
+                        <i data-lucide="message-square-quote" class="w-3.5 h-3.5"></i>
+                        <span>"Assalamualaikum, tolong belikan..."</span>
+                    </span>
                 </div>
             </div>
 
-            <!-- Bar Kawalan Pilih Barang Tertentu (Multi-Select Mode) -->
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-emerald-200/60 dark:border-slate-800">
+            <!-- Bar Kawalan Pilih Barang Tertentu Sahaja -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-emerald-200/60 dark:border-slate-800">
                 <button type="button" id="btn-toggle-select-mode" onclick="window.toggleSelectMode()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 transition shadow-sm">
                     <i data-lucide="list-checks" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
-                    <span id="text-toggle-select-mode">Pilih Barang Tertentu</span>
+                    <span id="text-toggle-select-mode">Pilih Barang Tertentu Sahaja</span>
                 </button>
 
                 <div id="select-mode-actions" class="hidden items-center gap-2">
                     <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
                         Dipilih: <span id="selected-count">0</span>
                     </span>
-                    <button type="button" onclick="window.selectAllPending()" class="text-[11px] font-bold underline text-slate-600 dark:text-slate-300 hover:text-indigo-600">Pilih Semua Belum Beli</button>
+                    <button type="button" onclick="window.selectAllPending()" class="text-[11px] font-bold underline text-slate-600 dark:text-slate-300 hover:text-indigo-600">Pilih Semua</button>
                     <button type="button" onclick="window.clearSelection()" class="text-[11px] font-bold underline text-rose-600 dark:text-rose-400">Kosongkan</button>
                 </div>
             </div>
 
-            <!-- Butang Utama WhatsApp, Telegram & Salin -->
-            <div class="grid grid-cols-12 gap-2.5">
-                <!-- WhatsApp -->
-                <button type="button" onclick="window.shareList('whatsapp')" class="col-span-5 py-3 px-3 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition">
-                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
-                        <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/>
-                    </svg>
-                    <span>WhatsApp</span>
+            <!-- Butang Utama: Kongsi Gambar + Teks (Web Share API) -->
+            <div class="space-y-2">
+                <button type="button" onclick="window.shareWithImagesAndText()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 transition">
+                    <i data-lucide="share-2" class="w-4 h-4 shrink-0"></i>
+                    <span>Kongsi Gambar + Teks (WhatsApp / Telegram)</span>
+                    <span id="share-image-count-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white/20 text-white">0 gambar</span>
                 </button>
 
-                <!-- Telegram -->
-                <button type="button" onclick="window.shareList('telegram')" class="col-span-5 py-3 px-3 rounded-2xl bg-[#229ED9] hover:bg-[#1d8cc2] active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-sky-500/20 flex items-center justify-center gap-2 transition">
-                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
-                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                    </svg>
-                    <span>Telegram</span>
-                </button>
+                <!-- Butang Pantas Teks Sahaja: WhatsApp, Telegram & Salin Teks -->
+                <div class="grid grid-cols-12 gap-2">
+                    <!-- WhatsApp -->
+                    <button type="button" onclick="window.shareTextOnly('whatsapp')" class="col-span-5 py-2.5 px-3 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z"/>
+                        </svg>
+                        <span>WhatsApp</span>
+                    </button>
 
-                <!-- Copy Text -->
-                <button type="button" onclick="window.copyShareText()" title="Salin Teks Senarai" class="col-span-2 py-3 px-2 rounded-2xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center transition">
-                    <i data-lucide="copy" class="w-4 h-4"></i>
-                </button>
+                    <!-- Telegram -->
+                    <button type="button" onclick="window.shareTextOnly('telegram')" class="col-span-5 py-2.5 px-3 rounded-2xl bg-[#229ED9] hover:bg-[#1d8cc2] active:scale-95 text-white font-extrabold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition">
+                        <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                        <span>Telegram</span>
+                    </button>
+
+                    <!-- Salin Teks -->
+                    <button type="button" onclick="window.copyShareText()" title="Salin Teks Pesanan" class="col-span-2 py-2.5 px-2 rounded-2xl bg-white hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs flex items-center justify-center gap-1 transition">
+                        <i data-lucide="copy" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </div>
         </section>
 
-        <!-- 3. PENAPIS TAB & TINDAKAN BERSIHKAN DAH BELI -->
+        <!-- 3. PENAPIS TAB & SENARAI BARANG -->
         <section class="space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2">
                 <!-- Tab Penapis: Semua, Belum Beli, Tiada Stok, Dah Beli -->
@@ -278,19 +317,19 @@
                 </div>
                 <h4 id="empty-state-title" class="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">Senarai Masih Kosong</h4>
                 <p id="empty-state-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Taip nama barang di kotak atas untuk mula mencatat barang nak beli.
+                    Taip nama barang di kotak atas dan lampirkan gambar contoh jika perlu.
                 </p>
             </div>
         </section>
     </main>
 
-    <!-- MODAL 1: Edit Barang & Status Kedai Tiada Stok -->
-    <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-pop-in">
+    <!-- MODAL 1: Edit Barang, Nota Tiada Stok & Gambar Contoh -->
+    <div id="edit-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-pop-in my-auto">
             <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <h3 class="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                     <i data-lucide="edit-3" class="w-4 h-4 text-emerald-600"></i>
-                    <span>Edit Barang / Status Stok</span>
+                    <span>Edit Barang & Gambar Contoh</span>
                 </h3>
                 <button onclick="window.closeEditModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -310,6 +349,30 @@
                     <input type="text" id="edit-item-qty" placeholder="Contoh: 1 pek, 2 botol, 1 kg" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
 
+                <!-- Gambar Contoh Dalam Modal Edit -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">Gambar Contoh Barang (Pilihan)</label>
+                    <input type="file" id="edit-input-image" accept="image/*" class="hidden" onchange="window.handleImageInputChange(event, 'edit')">
+
+                    <div id="edit-image-preview-wrapper" class="hidden items-center justify-between p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img id="edit-image-preview-img" src="" alt="Gambar Contoh" class="w-14 h-14 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0 bg-white">
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Gambar Contoh Aktif</p>
+                                <button type="button" onclick="document.getElementById('edit-input-image').click()" class="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline mt-0.5">Tukar Gambar</button>
+                            </div>
+                        </div>
+                        <button type="button" onclick="window.clearEditImage()" class="p-2 rounded-xl text-rose-600 hover:bg-rose-100 dark:hover:bg-rose-950/60 transition" title="Buang Gambar">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <button type="button" id="btn-edit-add-image" onclick="document.getElementById('edit-input-image').click()" class="w-full py-2.5 px-3 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-indigo-950/20 text-xs font-extrabold text-indigo-700 dark:text-indigo-300 flex items-center justify-center gap-1.5 hover:bg-indigo-100/70 transition">
+                        <i data-lucide="image-plus" class="w-4 h-4"></i>
+                        <span>Muat Naik / Tukar Gambar Contoh</span>
+                    </button>
+                </div>
+
                 <!-- Status Tiada Stok di Kedai -->
                 <div class="flex items-center justify-between p-3.5 rounded-2xl bg-rose-50/80 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/50">
                     <div>
@@ -322,10 +385,10 @@
                     </label>
                 </div>
 
-                <!-- Nota Ringkas (Pilihan) -->
+                <!-- Nota Ringkas -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nota Ringkas (Pilihan)</label>
-                    <input type="text" id="edit-item-note" placeholder="Cth: Kedai depan habis stok, cuba cari di kedai lain..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nota Kedai / Jenama (Pilihan)</label>
+                    <input type="text" id="edit-item-note" placeholder="Cth: Kedai depan habis stok, atau nak botol besar..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2">
@@ -340,7 +403,35 @@
         </div>
     </div>
 
-    <!-- MODAL 2: Pengesahan Padam Semua Dah Beli -->
+    <!-- MODAL 2: Pratonton Penuh Gambar Contoh (Lightbox) -->
+    <div id="image-lightbox-modal" onclick="window.closeImageLightbox()" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-4">
+        <div onclick="event.stopPropagation()" class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-pop-in">
+            <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                    <h3 id="lightbox-title" class="text-sm font-extrabold text-slate-900 dark:text-white truncate">Contoh Gambar Barang</h3>
+                    <p id="lightbox-subtitle" class="text-[11px] text-slate-500 dark:text-slate-400 truncate"></p>
+                </div>
+                <button onclick="window.closeImageLightbox()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition shrink-0">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-4 bg-slate-100 dark:bg-slate-950 flex items-center justify-center">
+                <img id="lightbox-img" src="" alt="Gambar Penuh" class="max-h-[65vh] w-auto rounded-2xl object-contain shadow-md">
+            </div>
+            <div class="px-4 py-3 flex items-center justify-between gap-2">
+                <button type="button" id="btn-lightbox-download" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>Muat Turun Gambar</span>
+                </button>
+                <button type="button" id="btn-lightbox-share-single" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 shadow-sm transition">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                    <span>Kongsi Barang Ini</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Pengesahan Padam Semua Dah Beli -->
     <div id="clear-bought-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
         <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 text-center animate-pop-in">
             <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 flex items-center justify-center mx-auto mb-3">
@@ -402,8 +493,8 @@
         googleProvider.setCustomParameters({ prompt: 'select_account' });
 
         // Kunci LocalStorage
-        const LS_ITEMS_KEY = 'beli_barang_simple_v4_guest';
-        const LS_THEME_KEY = 'beli_barang_theme_v4';
+        const LS_ITEMS_KEY = 'beli_barang_universal_v5_guest';
+        const LS_THEME_KEY = 'beli_barang_theme_v5';
 
         // State Aplikasi
         let currentUser = null;
@@ -413,8 +504,12 @@
         let isSelectMode = false;
         let selectedIdsForShare = new Set();
 
+        // State Gambar Contoh (Base64 ringan)
+        let pendingAddImageDataUrl = '';
+        let pendingEditImageDataUrl = '';
+
         // ==========================================
-        // 1. PWA ICON & MANIFEST DINAMIK (iPadOS / Mudah Alih)
+        // 1. PWA ICON & MANIFEST DINAMIK
         // ==========================================
         function setupDynamicPWA() {
             try {
@@ -436,7 +531,6 @@
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
 
-                // Lukis beg beli-belah dengan tanda semak
                 ctx.strokeRect(140, 195, 232, 195);
                 ctx.beginPath();
                 ctx.arc(256, 195, 56, Math.PI, 0, false);
@@ -455,7 +549,7 @@
                 const manifest = {
                     name: "Beli Barang Record",
                     short_name: "Beli Barang",
-                    description: "Aplikasi senarai beli barang ringkas dan pantas dengan kongsi WhatsApp & Telegram.",
+                    description: "Senarai beli barang ringkas dengan gambar contoh dan perkongsian WhatsApp/Telegram.",
                     start_url: window.location.href,
                     display: "standalone",
                     background_color: "#0f172a",
@@ -527,7 +621,7 @@
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.25s ease';
                 setTimeout(() => toast.remove(), 250);
-            }, 2800);
+            }, 3000);
         }
 
         function escapeHTML(str) {
@@ -541,7 +635,149 @@
         }
 
         // ==========================================
-        // 4. LOG MASUK GOOGLE (signInWithPopup SAHAJA)
+        // 4. MAMPATAN GAMBAR CONTOH & PASTE CLIPBOARD
+        // ==========================================
+        function compressImageFileToBase64(file, maxDimension = 720, quality = 0.72) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type.startsWith('image/')) {
+                    reject(new Error("Fail bukan imej yang sah."));
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxDimension || height > maxDimension) {
+                            if (width > height) {
+                                height = Math.round((height * maxDimension) / width);
+                                width = maxDimension;
+                            } else {
+                                width = Math.round((width * maxDimension) / height);
+                                height = maxDimension;
+                            }
+                        }
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedDataUrl);
+                    };
+                    img.onerror = () => reject(new Error("Gagal membaca gambar."));
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject(new Error("Gagal memuatkan fail."));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        window.handleImageInputChange = async function (event, targetMode) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            try {
+                const compressedUrl = await compressImageFileToBase64(file);
+                const approxKb = Math.round((compressedUrl.length * 3) / 4 / 1024);
+
+                if (targetMode === 'add') {
+                    pendingAddImageDataUrl = compressedUrl;
+                    document.getElementById('add-image-preview-img').src = compressedUrl;
+                    document.getElementById('add-image-size-label').textContent = `Saiz dioptimumkan (~${approxKb} KB)`;
+                    const box = document.getElementById('add-image-preview-box');
+                    box.classList.remove('hidden');
+                    box.classList.add('flex');
+                    showToast("Gambar contoh dilampirkan!");
+                } else if (targetMode === 'edit') {
+                    pendingEditImageDataUrl = compressedUrl;
+                    updateEditModalImageUI(compressedUrl);
+                    showToast("Gambar contoh dikemas kini!");
+                }
+            } catch (err) {
+                console.error("Image compression error:", err);
+                showToast("Gagal memproses gambar: " + err.message, "error");
+            } finally {
+                event.target.value = '';
+            }
+        };
+
+        window.clearAddImage = function () {
+            pendingAddImageDataUrl = '';
+            const box = document.getElementById('add-image-preview-box');
+            box.classList.add('hidden');
+            box.classList.remove('flex');
+            document.getElementById('add-image-preview-img').src = '';
+        };
+
+        window.clearEditImage = function () {
+            pendingEditImageDataUrl = '';
+            updateEditModalImageUI('');
+        };
+
+        function updateEditModalImageUI(imageUrl) {
+            const wrapper = document.getElementById('edit-image-preview-wrapper');
+            const addBtn = document.getElementById('btn-edit-add-image');
+            const imgEl = document.getElementById('edit-image-preview-img');
+
+            if (imageUrl) {
+                imgEl.src = imageUrl;
+                wrapper.classList.remove('hidden');
+                wrapper.classList.add('flex');
+                addBtn.classList.add('hidden');
+            } else {
+                imgEl.src = '';
+                wrapper.classList.add('hidden');
+                wrapper.classList.remove('flex');
+                addBtn.classList.remove('hidden');
+            }
+        }
+
+        // Sokongan Tampal (Paste Ctrl+V) Gambar Contoh terus dari papan keratan
+        document.addEventListener('paste', async (event) => {
+            const itemsClipboard = event.clipboardData && event.clipboardData.items;
+            if (!itemsClipboard) return;
+
+            for (const clipItem of itemsClipboard) {
+                if (clipItem.type.startsWith('image/')) {
+                    const file = clipItem.getAsFile();
+                    if (!file) continue;
+
+                    const editModalOpen = !document.getElementById('edit-modal').classList.contains('hidden');
+                    try {
+                        const compressedUrl = await compressImageFileToBase64(file);
+                        const approxKb = Math.round((compressedUrl.length * 3) / 4 / 1024);
+
+                        if (editModalOpen) {
+                            pendingEditImageDataUrl = compressedUrl;
+                            updateEditModalImageUI(compressedUrl);
+                            showToast("Gambar contoh ditampal ke borang Edit!");
+                        } else {
+                            pendingAddImageDataUrl = compressedUrl;
+                            document.getElementById('add-image-preview-img').src = compressedUrl;
+                            document.getElementById('add-image-size-label').textContent = `Gambar ditampal (~${approxKb} KB)`;
+                            const box = document.getElementById('add-image-preview-box');
+                            box.classList.remove('hidden');
+                            box.classList.add('flex');
+                            showToast("Gambar contoh berjaya ditampal!");
+                        }
+                    } catch (err) {
+                        showToast("Gagal menampal gambar.", "error");
+                    }
+                    break;
+                }
+            }
+        });
+
+        // ==========================================
+        // 5. LOG MASUK GOOGLE (signInWithPopup SAHAJA)
         // ==========================================
         window.loginWithGoogle = async function () {
             try {
@@ -604,7 +840,7 @@
         });
 
         // ==========================================
-        // 5. SIMPANAN DATA: FIRESTORE & LOCALSTORAGE
+        // 6. SIMPANAN DATA: FIRESTORE & LOCALSTORAGE
         // ==========================================
         function getGuestItemsFromStorage() {
             try {
@@ -615,7 +851,12 @@
         }
 
         function saveGuestItemsToStorage(list) {
-            localStorage.setItem(LS_ITEMS_KEY, JSON.stringify(list));
+            try {
+                localStorage.setItem(LS_ITEMS_KEY, JSON.stringify(list));
+            } catch (err) {
+                console.error("LocalStorage quota error:", err);
+                showToast("Storan pelayar penuh. Sila log masuk Google untuk simpanan awan.", "warning");
+            }
         }
 
         function loadGuestItems() {
@@ -684,7 +925,7 @@
         };
 
         // ==========================================
-        // 6. TAMBAH, TICK, TIADA STOK, EDIT & PADAM
+        // 7. TAMBAH, TICK, TIADA STOK, EDIT & PADAM
         // ==========================================
         window.setQuickQty = function (val) {
             const qtyInput = document.getElementById('input-item-qty');
@@ -699,6 +940,7 @@
 
             const name = nameInput.value.trim();
             const qty = qtyInput.value.trim() || '1';
+            const imageUrl = pendingAddImageDataUrl || '';
 
             if (!name) return;
 
@@ -706,6 +948,7 @@
             const newItem = {
                 name,
                 qty,
+                imageUrl,
                 bought: false,
                 outOfStock: false,
                 note: '',
@@ -714,6 +957,7 @@
 
             nameInput.value = '';
             qtyInput.value = '1';
+            window.clearAddImage();
             nameInput.focus();
 
             try {
@@ -732,7 +976,7 @@
                     saveGuestItemsToStorage(items);
                     renderLists();
                 }
-                showToast(`Ditambah: ${name} (${qty})`);
+                showToast(imageUrl ? `Ditambah dengan gambar: ${name}` : `Ditambah: ${name} (${qty})`);
             } catch (error) {
                 console.error("Add error:", error);
                 showToast("Gagal menambah barang: " + error.message, "error");
@@ -823,6 +1067,9 @@
             document.getElementById('edit-item-outofstock').checked = Boolean(target.outOfStock);
             document.getElementById('edit-item-note').value = target.note || '';
 
+            pendingEditImageDataUrl = target.imageUrl || '';
+            updateEditModalImageUI(pendingEditImageDataUrl);
+
             const modal = document.getElementById('edit-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -833,6 +1080,7 @@
             const modal = document.getElementById('edit-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            pendingEditImageDataUrl = '';
         };
 
         window.handleSaveEdit = async function (event) {
@@ -842,10 +1090,11 @@
             const qty = document.getElementById('edit-item-qty').value.trim() || '1';
             const outOfStock = document.getElementById('edit-item-outofstock').checked;
             const note = document.getElementById('edit-item-note').value.trim();
+            const imageUrl = pendingEditImageDataUrl || '';
 
             if (!name) return;
 
-            const updates = { name, qty, outOfStock, note };
+            const updates = { name, qty, outOfStock, note, imageUrl };
 
             try {
                 if (currentUser) {
@@ -865,6 +1114,44 @@
                 showToast("Gagal menyimpan perubahan.", "error");
             }
         };
+
+        // Modal Lightbox Pratonton Penuh Gambar
+        window.openImageLightbox = function (id) {
+            const target = items.find(i => i.id === id);
+            if (!target || !target.imageUrl) return;
+
+            document.getElementById('lightbox-title').textContent = `${target.name} (${target.qty || '1'})`;
+            document.getElementById('lightbox-subtitle').textContent = target.note || 'Contoh gambar barang';
+            document.getElementById('lightbox-img').src = target.imageUrl;
+
+            const btnDownload = document.getElementById('btn-lightbox-download');
+            btnDownload.onclick = () => downloadDataUrlImage(target.imageUrl, target.name);
+
+            const btnShareSingle = document.getElementById('btn-lightbox-share-single');
+            btnShareSingle.onclick = () => shareSingleItemWithImage(target);
+
+            const modal = document.getElementById('image-lightbox-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        };
+
+        window.closeImageLightbox = function () {
+            const modal = document.getElementById('image-lightbox-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        function downloadDataUrlImage(dataUrl, itemName) {
+            const link = document.createElement('a');
+            const safeFilename = (itemName || 'contoh-barang').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            link.href = dataUrl;
+            link.download = `contoh-${safeFilename}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Gambar dimuat turun!");
+        }
 
         // Modal Padam Semua Dah Beli
         window.openClearBoughtModal = function () {
@@ -907,7 +1194,7 @@
         };
 
         // ==========================================
-        // 7. PENAPIS TAB & MOD PILIH BARANG KIRIM
+        // 8. PENAPIS TAB, PILIH BARANG & WEB SHARE API
         // ==========================================
         window.setFilterTab = function (tab) {
             activeFilterTab = tab;
@@ -931,7 +1218,6 @@
             const helperText = document.getElementById('share-helper-text');
 
             if (isSelectMode) {
-                // Pastikan paparan menunjukkan item belum beli supaya mudah dipilih
                 if (activeFilterTab === 'bought') {
                     window.setFilterTab('pending');
                 }
@@ -939,14 +1225,14 @@
                 btnText.textContent = "Selesai Memilih";
                 actionsBar.classList.remove('hidden');
                 actionsBar.classList.add('flex');
-                helperText.innerHTML = `Tick kotak <strong class="text-indigo-600 dark:text-indigo-400">Pilih Kirim</strong> pada barang yang nak dihantar sahaja.`;
+                helperText.innerHTML = `Tick kotak <strong class="text-indigo-600 dark:text-indigo-400">Pilih</strong> pada barang tertentu sahaja untuk dikongsi.`;
             } else {
                 selectedIdsForShare.clear();
                 btn.className = "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-extrabold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 transition shadow-sm";
-                btnText.textContent = "Pilih Barang Tertentu";
+                btnText.textContent = "Pilih Barang Tertentu Sahaja";
                 actionsBar.classList.add('hidden');
                 actionsBar.classList.remove('flex');
-                helperText.innerHTML = `Hantar <strong class="text-emerald-700 dark:text-emerald-400">semua barang belum beli</strong> ke WhatsApp / Telegram, atau pilih item tertentu sahaja.`;
+                helperText.innerHTML = `Hantar <strong class="text-emerald-700 dark:text-emerald-400">semua barang belum beli</strong> beserta gambar contoh (jika ada) dengan ayat sopan universal.`;
             }
 
             updateSelectedCountUI();
@@ -975,61 +1261,160 @@
             renderLists();
         };
 
-        function updateSelectedCountUI() {
-            document.getElementById('selected-count').textContent = selectedIdsForShare.size;
-        }
-
-        function buildFormattedShareMessage() {
+        function getTargetItemsForShare() {
             const pendingItems = items.filter(i => !i.bought);
-            let targetList = [];
-
-            if (isSelectMode && selectedIdsForShare.size > 0) {
-                targetList = pendingItems.filter(i => selectedIdsForShare.has(i.id));
-            } else if (isSelectMode && selectedIdsForShare.size === 0) {
-                return { error: "Sila tick sekurang-kurangnya 1 barang untuk dihantar!" };
-            } else {
-                targetList = pendingItems;
+            if (isSelectMode) {
+                if (selectedIdsForShare.size === 0) {
+                    return { error: "Sila tick sekurang-kurangnya 1 barang untuk dihantar!" };
+                }
+                return { list: pendingItems.filter(i => selectedIdsForShare.has(i.id)) };
             }
-
-            if (targetList.length === 0) {
+            if (pendingItems.length === 0) {
                 return { error: "Tiada barang belum beli dalam senarai untuk dihantar!" };
             }
-
-            const style = document.getElementById('share-style').value;
-            let headerTitle = "";
-            let footerLine = "";
-
-            if (style === 'tolong') {
-                headerTitle = "Assalamualaikum / Hi, tolong belikan barang ni jap:\n\n";
-                footerLine = "\n\nTerima kasih 🙏";
-            } else if (style === 'senarai') {
-                headerTitle = "🛒 *Senarai barang nak beli:*\n\n";
-                footerLine = "";
-            } else {
-                headerTitle = "";
-                footerLine = "";
-            }
-
-            const lines = targetList.map(item => {
-                const icon = item.outOfStock ? "❌" : "⬜";
-                const qtyText = item.qty ? ` (${item.qty})` : "";
-                const stockTag = item.outOfStock ? " - *[Tiada Stok]*" : "";
-                const noteTag = item.note ? `\n   _Nota: ${item.note}_` : "";
-                return `${icon} ${item.name}${qtyText}${stockTag}${noteTag}`;
-            });
-
-            const fullText = `${headerTitle}${lines.join('\n')}${footerLine}`;
-            return { text: fullText };
+            return { list: pendingItems };
         }
 
-        window.shareList = function (platform) {
-            const result = buildFormattedShareMessage();
-            if (result.error) {
-                showToast(result.error, "warning");
+        function updateSelectedCountUI() {
+            document.getElementById('selected-count').textContent = selectedIdsForShare.size;
+            updateImageCountBadge();
+        }
+
+        function updateImageCountBadge() {
+            const pendingItems = items.filter(i => !i.bought);
+            const activeList = (isSelectMode && selectedIdsForShare.size > 0)
+                ? pendingItems.filter(i => selectedIdsForShare.has(i.id))
+                : pendingItems;
+
+            const imgCount = activeList.filter(i => Boolean(i.imageUrl)).length;
+            const badge = document.getElementById('share-image-count-badge');
+
+            if (imgCount > 0) {
+                badge.textContent = `${imgCount} gambar`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function formatUniversalShareMessage(targetList) {
+            const hasAnyImage = targetList.some(item => Boolean(item.imageUrl));
+
+            const lines = targetList.map((item, idx) => {
+                const qtyText = item.qty ? ` (${item.qty})` : "";
+                const stockTag = item.outOfStock ? " [Tiada Stok]" : "";
+                const noteTag = item.note ? ` — ${item.note}` : "";
+                return `${idx + 1}. ${item.name}${qtyText}${stockTag}${noteTag}`;
+            });
+
+            let message = `Assalamualaikum, tolong belikan barang di bawah ni boleh?\n\n${lines.join('\n')}`;
+
+            if (hasAnyImage) {
+                message += `\n\nContoh gambar barang seperti dilampirkan.`;
+            }
+
+            return message;
+        }
+
+        async function dataUrlToFile(dataUrl, filename) {
+            const res = await fetch(dataUrl);
+            const blob = await res.blob();
+            return new File([blob], filename, { type: blob.type || 'image/jpeg' });
+        }
+
+        // Kongsi Gambar + Teks menggunakan Web Share API (atau muat turun fallback di desktop)
+        window.shareWithImagesAndText = async function () {
+            const targetRes = getTargetItemsForShare();
+            if (targetRes.error) {
+                showToast(targetRes.error, "warning");
                 return;
             }
 
-            const encodedText = encodeURIComponent(result.text);
+            const targetList = targetRes.list;
+            const messageText = formatUniversalShareMessage(targetList);
+            const itemsWithImages = targetList.filter(i => Boolean(i.imageUrl));
+
+            try {
+                // Tukar semua gambar contoh kepada objek File
+                const imageFiles = await Promise.all(
+                    itemsWithImages.map((item, index) => {
+                        const safeName = (item.name || 'barang').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                        return dataUrlToFile(item.imageUrl, `contoh-${index + 1}-${safeName}.jpg`);
+                    })
+                );
+
+                // Semak sokongan Web Share API dengan fail (iPadOS, iOS Safari, Android Chrome)
+                if (imageFiles.length > 0 && navigator.canShare && navigator.canShare({ files: imageFiles })) {
+                    await navigator.share({
+                        files: imageFiles,
+                        text: messageText,
+                        title: 'Senarai Beli Barang'
+                    });
+                    showToast("Berjaya membuka menu kongsi dengan gambar!");
+                    return;
+                }
+
+                // Jika tiada gambar dilampirkan tetapi pelayar menyokong navigator.share teks
+                if (imageFiles.length === 0 && navigator.share) {
+                    await navigator.share({
+                        text: messageText,
+                        title: 'Senarai Beli Barang'
+                    });
+                    return;
+                }
+
+                // Fallback Desktop (Windows/Mac pelayar yang tidak menyokong share fail):
+                // Muat turun gambar contoh secara automatik, salin teks, dan buka WhatsApp Web
+                if (itemsWithImages.length > 0) {
+                    itemsWithImages.forEach((item) => {
+                        downloadDataUrlImage(item.imageUrl, item.name);
+                    });
+                    copyTextToClipboardFallback(messageText);
+                    showToast("Gambar dimuat turun & teks disalin! Sila lampirkan gambar di WhatsApp.", "warning");
+                } else {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(messageText)}`, '_blank');
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error("Web Share error:", err);
+                    showToast("Gagal membuka menu kongsi: " + err.message, "error");
+                }
+            }
+        };
+
+        async function shareSingleItemWithImage(item) {
+            const qtyText = item.qty ? ` (${item.qty})` : "";
+            const noteTag = item.note ? ` — ${item.note}` : "";
+            const messageText = `Assalamualaikum, tolong belikan barang di bawah ni boleh?\n\n1. ${item.name}${qtyText}${noteTag}\n\nContoh gambar barang seperti dilampirkan.`;
+
+            try {
+                const file = await dataUrlToFile(item.imageUrl, `contoh-${item.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`);
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        text: messageText
+                    });
+                } else {
+                    downloadDataUrlImage(item.imageUrl, item.name);
+                    copyTextToClipboardFallback(messageText);
+                    showToast("Gambar dimuat turun & teks disalin ke clipboard!", "warning");
+                }
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showToast("Gagal berkongsi gambar.", "error");
+                }
+            }
+        }
+
+        window.shareTextOnly = function (platform) {
+            const targetRes = getTargetItemsForShare();
+            if (targetRes.error) {
+                showToast(targetRes.error, "warning");
+                return;
+            }
+
+            const messageText = formatUniversalShareMessage(targetRes.list);
+            const encodedText = encodeURIComponent(messageText);
 
             if (platform === 'whatsapp') {
                 window.open(`https://wa.me/?text=${encodedText}`, '_blank');
@@ -1038,41 +1423,46 @@
             }
         };
 
-        window.copyShareText = function () {
-            const result = buildFormattedShareMessage();
-            if (result.error) {
-                showToast(result.error, "warning");
-                return;
-            }
-
+        function copyTextToClipboardFallback(text) {
             const tempTextarea = document.createElement('textarea');
-            tempTextarea.value = result.text;
+            tempTextarea.value = text;
             tempTextarea.style.position = 'fixed';
             tempTextarea.style.left = '-9999px';
             document.body.appendChild(tempTextarea);
             tempTextarea.select();
             try {
                 document.execCommand('copy');
-                showToast("Senarai barang berjaya disalin!");
-            } catch (err) {
-                showToast("Gagal menyalin teks.", "error");
+            } finally {
+                document.body.removeChild(tempTextarea);
             }
-            document.body.removeChild(tempTextarea);
+        }
+
+        window.copyShareText = function () {
+            const targetRes = getTargetItemsForShare();
+            if (targetRes.error) {
+                showToast(targetRes.error, "warning");
+                return;
+            }
+
+            const messageText = formatUniversalShareMessage(targetRes.list);
+            copyTextToClipboardFallback(messageText);
+            showToast("Teks pesanan berjaya disalin!");
         };
 
         // ==========================================
-        // 8. PAPARAN SENARAI (RENDER UI)
+        // 9. PAPARAN SENARAI (RENDER UI)
         // ==========================================
         function renderLists() {
             const pendingItems = items.filter(i => !i.bought);
             const outOfStockItems = items.filter(i => !i.bought && i.outOfStock);
             const boughtItems = items.filter(i => i.bought);
 
-            // Kemaskini lencana kiraan pada Tab
+            // Kemaskini lencana kiraan pada Tab & Butang Kongsi Gambar
             document.getElementById('count-all').textContent = items.length;
             document.getElementById('count-pending').textContent = pendingItems.length;
             document.getElementById('count-outofstock').textContent = outOfStockItems.length;
             document.getElementById('count-bought').textContent = boughtItems.length;
+            updateImageCountBadge();
 
             // Tunjuk atau sorok butang Padam Semua Dah Beli
             const btnClearBought = document.getElementById('btn-clear-bought');
@@ -1093,7 +1483,6 @@
             } else if (activeFilterTab === 'bought') {
                 filteredItems = boughtItems;
             } else {
-                // Untuk tab 'Semua', letakkan Belum Beli di atas dan Dah Beli di bawah
                 filteredItems = [...pendingItems, ...boughtItems];
             }
 
@@ -1114,10 +1503,10 @@
                     emptyDesc.textContent = "Semua barang belum beli tidak bertanda Tiada Stok.";
                 } else if (activeFilterTab === 'bought') {
                     emptyTitle.textContent = "Belum Ada Barang Ditanda Dah Beli";
-                    emptyDesc.textContent = "Tick kotak pada senarai barang apabila anda selesai membelinya.";
+                    emptyDesc.textContent = "Tick kotak pada senarai barang apabila selesai dibeli.";
                 } else {
                     emptyTitle.textContent = "Senarai Masih Kosong";
-                    emptyDesc.textContent = "Taip nama barang di kotak atas untuk mula mencatat barang nak beli.";
+                    emptyDesc.textContent = "Taip nama barang di kotak atas dan lampirkan gambar contoh jika perlu.";
                 }
             } else {
                 emptyState.classList.add('hidden');
@@ -1125,11 +1514,14 @@
                     if (item.bought) {
                         return `
                             <div class="rounded-2xl p-3.5 border border-slate-200/70 dark:border-slate-800/70 bg-slate-100/80 dark:bg-slate-900/50 flex items-center justify-between gap-3 opacity-80 transition">
-                                <div onclick="window.toggleBought('${item.id}')" class="flex items-center gap-3 min-w-0 flex-1 cursor-pointer select-none">
-                                    <button type="button" title="Tandakan Belum Beli" class="w-7 h-7 rounded-xl bg-emerald-500 border-2 border-emerald-500 text-white flex items-center justify-center shrink-0">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <button type="button" onclick="window.toggleBought('${item.id}')" title="Tandakan Belum Beli" class="w-7 h-7 rounded-xl bg-emerald-500 border-2 border-emerald-500 text-white flex items-center justify-center shrink-0">
                                         <i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>
                                     </button>
-                                    <div class="min-w-0 flex-1">
+                                    ${item.imageUrl ? `
+                                        <img src="${item.imageUrl}" onclick="window.openImageLightbox('${item.id}')" alt="${escapeHTML(item.name)}" class="w-10 h-10 rounded-xl object-cover border border-slate-300 dark:border-slate-700 shrink-0 cursor-pointer grayscale">
+                                    ` : ''}
+                                    <div onclick="window.toggleBought('${item.id}')" class="min-w-0 flex-1 cursor-pointer select-none">
                                         <span class="text-sm sm:text-base font-bold line-through text-slate-500 dark:text-slate-400 break-words">
                                             ${escapeHTML(item.name)}
                                         </span>
@@ -1155,10 +1547,10 @@
 
                     return `
                         <div class="rounded-2xl p-3.5 sm:p-4 border ${cardRing} shadow-sm transition flex items-center justify-between gap-3">
-                            <!-- Kiri: Checkbox Dah Beli atau Pilih Kirim -->
+                            <!-- Kiri: Checkbox Dah Beli atau Pilih + Thumbnail Gambar -->
                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                 ${isSelectMode ? `
-                                    <button type="button" onclick="window.toggleSelectItemForShare('${item.id}')" title="Pilih untuk kirim" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center shrink-0 transition ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-slate-800'}">
+                                    <button type="button" onclick="window.toggleSelectItemForShare('${item.id}')" title="Pilih untuk dikongsi" class="w-7 h-7 rounded-xl border-2 flex items-center justify-center shrink-0 transition ${isSelected ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-slate-800'}">
                                         ${isSelected ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : ''}
                                     </button>
                                 ` : `
@@ -1166,9 +1558,18 @@
                                     </button>
                                 `}
 
+                                ${item.imageUrl ? `
+                                    <button type="button" onclick="window.openImageLightbox('${item.id}')" title="Lihat Gambar Contoh" class="relative w-12 h-12 rounded-xl overflow-hidden border border-indigo-200 dark:border-indigo-800 shrink-0 group shadow-sm bg-white">
+                                        <img src="${item.imageUrl}" alt="${escapeHTML(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition">
+                                        <span class="absolute bottom-0 right-0 bg-indigo-600/90 text-white p-0.5 rounded-tl-md">
+                                            <i data-lucide="zoom-in" class="w-3 h-3"></i>
+                                        </span>
+                                    </button>
+                                ` : ''}
+
                                 <!-- Nama Barang, Kuantiti & Status Tiada Stok -->
                                 <div onclick="${isSelectMode ? `window.toggleSelectItemForShare('${item.id}')` : `window.toggleBought('${item.id}')`}" class="min-w-0 flex-1 cursor-pointer select-none">
-                                    <div class="flex flex-wrap items-center gap-2">
+                                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                                         <span class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white break-words">
                                             ${escapeHTML(item.name)}
                                         </span>
@@ -1195,7 +1596,7 @@
                                     ${item.outOfStock ? 'Habis' : 'Tiada Stok'}
                                 </button>
 
-                                <button type="button" onclick="window.openEditModal('${item.id}')" title="Edit Barang" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-emerald-600 dark:text-slate-400 transition">
+                                <button type="button" onclick="window.openEditModal('${item.id}')" title="Edit / Gambar" class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-emerald-600 dark:text-slate-400 transition">
                                     <i data-lucide="pencil" class="w-4 h-4"></i>
                                 </button>
 
@@ -1212,7 +1613,7 @@
         }
 
         // ==========================================
-        // 9. PERMULAAN APLIKASI
+        // 10. PERMULAAN APLIKASI
         // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
             initTheme();
