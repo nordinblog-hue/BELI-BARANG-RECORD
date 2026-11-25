@@ -393,41 +393,41 @@
                             <option value="Hardware">Hardware</option>
                             <option value="Kedai RM2">Kedai RM2</option>
                             <option value="DIY">DIY</option>
-                            <option value="Lain-lain">Lain-lain</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Tarikh Perlu Beli / Target Beli -->
-                <div class="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50 space-y-3">
-                    <div>
-                        <label class="block text-xs font-extrabold text-indigo-800 dark:text-indigo-300 mb-1 flex items-center gap-1.5">
-                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-                            <span>Tarikh Perlu Beli / Target Beli *</span>
-                        </label>
-                        <input type="date" id="item-tarikh-beli" required onchange="window.syncDefaultRemindDate()" class="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-indigo-200 dark:border-slate-700 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-
-                    <!-- Tarikh & Masa Reminder -->
-                    <div class="pt-1 border-t border-indigo-100 dark:border-indigo-900/50">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <label class="text-xs font-extrabold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                                <i data-lucide="bell" class="w-3.5 h-3.5"></i>
-                                <span>Remind Sebelum Bila & Kul Berapa</span>
+                    <!-- Tarikh & Masa Reminder (Pilihan / Optional Toggle) -->
+                    <div class="pt-2 border-t border-indigo-100 dark:border-indigo-900/50">
+                        <div class="flex items-center justify-between">
+                            <label for="item-enable-reminder" class="flex items-center gap-2 cursor-pointer select-none">
+                                <span class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                                    <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                                </span>
+                                <div>
+                                    <span class="block text-xs font-extrabold text-slate-800 dark:text-slate-200">Set Reminder (Pilihan)</span>
+                                    <span class="block text-[10px] text-slate-500 dark:text-slate-400">Aktifkan hanya jika mahu amaran masa</span>
+                                </div>
                             </label>
-                            <div class="flex gap-1">
-                                <button type="button" onclick="window.setQuickRemindPreset('same_day')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">Hari Sama</button>
-                                <button type="button" onclick="window.setQuickRemindPreset('day_before')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">1 Hari Sebelum</button>
-                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="item-enable-reminder" onchange="window.toggleReminderFields()" class="sr-only peer">
+                                <div class="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                            </label>
                         </div>
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Tarikh Reminder</label>
-                                <input type="date" id="item-tarikh-remind" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+
+                        <div id="reminder-fields-container" class="hidden mt-3 pt-2.5 border-t border-dashed border-amber-200/80 dark:border-amber-900/40 space-y-2.5 animate-slide-up">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400">Remind Sebelum Bila & Kul Berapa</span>
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="window.setQuickRemindPreset('same_day')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">Hari Sama</button>
+                                    <button type="button" onclick="window.setQuickRemindPreset('day_before')" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:text-amber-300 text-amber-800 transition">1 Hari Sebelum</button>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Masa Reminder (Kul Berapa)</label>
-                                <input type="time" id="item-masa-remind" value="17:00" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Tarikh Reminder</label>
+                                    <input type="date" id="item-tarikh-remind" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-0.5">Masa Reminder (Kul Berapa)</label>
+                                    <input type="time" id="item-masa-remind" value="17:00" class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -796,6 +796,7 @@
 
             items.forEach(item => {
                 if (item.status === 'sudah') return;
+                if (item.reminderEnabled === false) return;
                 if (!item.tarikhRemind || !item.masaRemind) return;
 
                 const remindDateTime = new Date(`${item.tarikhRemind}T${item.masaRemind}:00`);
@@ -922,7 +923,7 @@
         }
 
         function subscribeCloudItems(uid) {
-            const colRef = collection(db, 'users', uid, 'beli_barang_items');
+            const colRef = collection(db, 'users', uid, 'items');
             const q = query(colRef);
 
             unsubscribeItems = onSnapshot(q, (snapshot) => {
@@ -963,7 +964,7 @@
 
             try {
                 const batch = writeBatch(db);
-                const colRef = collection(db, 'users', currentUser.uid, 'beli_barang_items');
+                const colRef = collection(db, 'users', currentUser.uid, 'items');
 
                 guestData.forEach(item => {
                     const newDocRef = doc(colRef);
@@ -988,7 +989,24 @@
         // ==========================================
         // 7. CRUD REKOD BARANG & REMINDER
         // ==========================================
+        window.toggleReminderFields = function () {
+            const isEnabled = document.getElementById('item-enable-reminder').checked;
+            const container = document.getElementById('reminder-fields-container');
+            if (isEnabled) {
+                container.classList.remove('hidden');
+                const tarikhBeli = document.getElementById('item-tarikh-beli').value || getLocalDateStr(0);
+                const tarikhRemindEl = document.getElementById('item-tarikh-remind');
+                if (!tarikhRemindEl.value) {
+                    tarikhRemindEl.value = tarikhBeli;
+                }
+            } else {
+                container.classList.add('hidden');
+            }
+        };
+
         window.syncDefaultRemindDate = function () {
+            const isEnabled = document.getElementById('item-enable-reminder').checked;
+            if (!isEnabled) return;
             const tarikhBeli = document.getElementById('item-tarikh-beli').value;
             const tarikhRemindEl = document.getElementById('item-tarikh-remind');
             if (tarikhBeli && !tarikhRemindEl.value) {
@@ -1015,20 +1033,23 @@
             const modal = document.getElementById('item-modal');
             const title = document.getElementById('item-modal-title');
             const form = document.getElementById('item-form');
+            const reminderToggle = document.getElementById('item-enable-reminder');
             form.reset();
 
             if (editId) {
                 const target = items.find(i => i.id === editId);
                 if (!target) return;
 
+                const hasReminder = Boolean(target.tarikhRemind && target.masaRemind && target.reminderEnabled !== false);
                 title.innerHTML = `<i data-lucide="edit-3" class="w-5 h-5 text-indigo-600"></i><span>Kemaskini Barang</span>`;
                 document.getElementById('item-id').value = target.id;
                 document.getElementById('item-name').value = target.name || '';
                 document.getElementById('item-qty-unit').value = target.qtyUnit || '1';
                 document.getElementById('item-category').value = target.category || 'Barang Dapur';
                 document.getElementById('item-tarikh-beli').value = target.tarikhBeli || getLocalDateStr(0);
-                document.getElementById('item-tarikh-remind').value = target.tarikhRemind || '';
-                document.getElementById('item-masa-remind').value = target.masaRemind || '17:00';
+                reminderToggle.checked = hasReminder;
+                document.getElementById('item-tarikh-remind').value = hasReminder ? target.tarikhRemind : '';
+                document.getElementById('item-masa-remind').value = hasReminder ? target.masaRemind : '17:00';
                 document.getElementById('item-notes').value = target.notes || '';
                 document.getElementById('item-status').value = target.status || 'belum';
             } else {
@@ -1037,11 +1058,13 @@
                 document.getElementById('item-id').value = '';
                 document.getElementById('item-qty-unit').value = '1';
                 document.getElementById('item-tarikh-beli').value = today;
-                document.getElementById('item-tarikh-remind').value = today;
+                reminderToggle.checked = false;
+                document.getElementById('item-tarikh-remind').value = '';
                 document.getElementById('item-masa-remind').value = '17:00';
                 document.getElementById('item-status').value = 'belum';
             }
 
+            window.toggleReminderFields();
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             lucide.createIcons();
@@ -1061,8 +1084,9 @@
             const qtyUnit = document.getElementById('item-qty-unit').value.trim() || '1';
             const category = document.getElementById('item-category').value;
             const tarikhBeli = document.getElementById('item-tarikh-beli').value;
-            const tarikhRemind = document.getElementById('item-tarikh-remind').value;
-            const masaRemind = document.getElementById('item-masa-remind').value;
+            const reminderEnabled = document.getElementById('item-enable-reminder').checked;
+            const tarikhRemind = reminderEnabled ? document.getElementById('item-tarikh-remind').value : '';
+            const masaRemind = reminderEnabled ? document.getElementById('item-masa-remind').value : '';
             const notes = document.getElementById('item-notes').value.trim();
             const status = document.getElementById('item-status').value;
 
@@ -1076,15 +1100,16 @@
                 qtyUnit,
                 category,
                 tarikhBeli,
-                tarikhRemind: tarikhRemind || '',
-                masaRemind: tarikhRemind ? (masaRemind || '17:00') : '',
+                reminderEnabled: Boolean(reminderEnabled && tarikhRemind),
+                tarikhRemind: (reminderEnabled && tarikhRemind) ? tarikhRemind : '',
+                masaRemind: (reminderEnabled && tarikhRemind) ? (masaRemind || '17:00') : '',
                 notes,
                 status
             };
 
             try {
                 if (currentUser) {
-                    const colRef = collection(db, 'users', currentUser.uid, 'beli_barang_items');
+                    const colRef = collection(db, 'users', currentUser.uid, 'items');
                     if (id) {
                         await updateDoc(doc(colRef, id), {
                             ...itemData,
@@ -1132,7 +1157,7 @@
 
             try {
                 if (currentUser) {
-                    const docRef = doc(db, 'users', currentUser.uid, 'beli_barang_items', id);
+                    const docRef = doc(db, 'users', currentUser.uid, 'items', id);
                     await updateDoc(docRef, {
                         status: nextStatus,
                         updatedAt: serverTimestamp()
@@ -1170,7 +1195,7 @@
             if (!itemToDeleteId) return;
             try {
                 if (currentUser) {
-                    await deleteDoc(doc(db, 'users', currentUser.uid, 'beli_barang_items', itemToDeleteId));
+                    await deleteDoc(doc(db, 'users', currentUser.uid, 'items', itemToDeleteId));
                 } else {
                     items = items.filter(i => i.id !== itemToDeleteId);
                     saveGuestItemsToStorage(items);
@@ -1189,9 +1214,10 @@
         // ==========================================
         function classifyItem(item) {
             const todayStr = getLocalDateStr(0);
+            const hasActiveReminderToday = item.reminderEnabled !== false && item.tarikhRemind === todayStr;
             if (item.status === 'sudah') return 'bought';
             if (item.tarikhBeli && item.tarikhBeli < todayStr) return 'overdue';
-            if (item.tarikhBeli === todayStr || item.tarikhRemind === todayStr) return 'today';
+            if (item.tarikhBeli === todayStr || hasActiveReminderToday) return 'today';
             return 'upcoming';
         }
 
@@ -1287,10 +1313,10 @@
                 }
 
                 // Paparan Waktu Reminder
-                const hasReminder = item.tarikhRemind && item.masaRemind;
+                const hasReminder = item.reminderEnabled !== false && item.tarikhRemind && item.masaRemind;
                 const reminderText = hasReminder
                     ? `Remind: ${formatShortDate(item.tarikhRemind)}, ${formatTime12Hour(item.masaRemind)}`
-                    : 'Tiada reminder ditetapkan';
+                    : 'Tiada reminder';
 
                 const cardBorderClass = isBought
                     ? 'border-slate-200/70 dark:border-slate-800/80 opacity-80'
@@ -1378,9 +1404,19 @@
             let titleText = '';
 
             if (mode === 'today') {
-                // Barang belum dibeli yang tarikh belinya hari ini ATAU remindernya hari ini ATAU sudah lewat (overdue)
-                targetList = items.filter(i => i.status !== 'sudah' && (i.tarikhBeli <= todayStr || i.tarikhRemind === todayStr));
-                titleText = `*🛒 SENARAI BARANG PERLU BELI HARI INI (${formatShortDate(todayStr)})*`;
+                // Barang belum dibeli untuk hari ini / lewat; jika tiada khusus hari ini, ambil semua yang belum beli
+                const todaySpecific = items.filter(i => {
+                    const hasActiveReminderToday = i.reminderEnabled !== false && i.tarikhRemind === todayStr;
+                    return i.status !== 'sudah' && (i.tarikhBeli <= todayStr || hasActiveReminderToday);
+                });
+
+                if (todaySpecific.length > 0) {
+                    targetList = todaySpecific;
+                    titleText = `*🛒 SENARAI BARANG PERLU BELI HARI INI (${formatShortDate(todayStr)})*`;
+                } else {
+                    targetList = items.filter(i => i.status !== 'sudah');
+                    titleText = `*🛒 SENARAI BARANG BELUM BELI (${formatShortDate(todayStr)})*`;
+                }
             } else {
                 targetList = items.filter(i => i.status !== 'sudah');
                 titleText = `*🛒 SEMUA SENARAI BARANG BELUM BELI*`;
@@ -1394,7 +1430,7 @@
             targetList.forEach((item, idx) => {
                 const qtyLabel = item.qtyUnit ? ` (${item.qtyUnit})` : '';
                 const catLabel = item.category ? ` [${item.category}]` : '';
-                const remindLabel = (item.tarikhRemind && item.masaRemind)
+                const remindLabel = (item.reminderEnabled !== false && item.tarikhRemind && item.masaRemind)
                     ? ` ⏰ Remind: ${formatShortDate(item.tarikhRemind)}, ${formatTime12Hour(item.masaRemind)}`
                     : '';
                 const noteLabel = item.notes ? `\n   _Catatan: ${item.notes}_` : '';
